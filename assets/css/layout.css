@@ -1,0 +1,96 @@
+/* layout.css - Grid and Section Structures */
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 var(--s6);
+}
+
+section {
+  padding: var(--s24) 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.grid {
+  display: grid;
+  gap: var(--s8);
+}
+
+.grid-12 {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--s6);
+}
+
+/* Section Header Style */
+.section-header {
+  margin-bottom: var(--s12);
+}
+
+.section-label {
+  font-family: var(--font-mono);
+  color: var(--terminal);
+  font-size: 0.9rem;
+  margin-bottom: var(--s2);
+  display: block;
+}
+
+.section-title {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  margin-bottom: var(--s4);
+}
+
+.section-subtitle {
+  color: var(--text-2);
+  font-size: 1.1rem;
+  max-width: 600px;
+}
+
+/* Glass Card Style */
+.glass-card {
+  background: var(--glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
+  padding: var(--s8);
+  transition: all 0.4s var(--ease-out-expo);
+}
+
+.glass-card:hover {
+  border-color: var(--border-hover);
+  box-shadow: 0 0 30px var(--crimson-glow);
+  transform: translateY(-5px);
+}
+
+/* Utilities */
+.text-gradient {
+  background: var(--grad-blaugrana);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 var(--s4);
+  }
+  
+  section {
+    padding: var(--s16) 0;
+  }
+  
+  .grid-12 {
+    grid-template-columns: 1fr;
+  }
+}

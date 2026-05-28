@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /flag.txt
+
+# FLAG{K41l4sh_1s_th3_0n3_wh0_kn0cks}

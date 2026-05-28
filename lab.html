@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secret Lab | Kailash Narayana Prasad</title>
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+</head>
+<body class="lab-page">
+  <div class="container">
+    <header class="section-header">
+      <a href="index.html" class="back-link">← cd ..</a>
+      <h1 class="section-title">The Secret Lab</h1>
+      <p class="section-subtitle">Interactive playground for crypto, ML, and blockchain experiments.</p>
+    </header>
+
+    <div class="lab-grid grid-12">
+      <!-- Toy 1: Cipher Tool -->
+      <div class="lab-card glass-card span-6">
+        <h3>Live Cipher Tool</h3>
+        <textarea id="cipher-input" placeholder="Enter text to encrypt/decrypt..."></textarea>
+        <div class="cipher-actions">
+          <select id="cipher-method">
+            <option value="rot13">ROT13</option>
+            <option value="base64">Base64</option>
+          </select>
+          <button id="cipher-exec" class="btn btn-primary">Process</button>
+        </div>
+        <textarea id="cipher-output" readonly placeholder="Output..."></textarea>
+      </div>
+
+      <!-- Toy 2: Personality Predictor -->
+      <div class="lab-card glass-card span-6">
+        <h3>Personality Predictor</h3>
+        <p>Enter a few sentences about yourself:</p>
+        <textarea id="ml-input" placeholder="I like solving problems and leading teams..."></textarea>
+        <button id="ml-predict" class="btn btn-primary">Predict →</button>
+        <div id="ml-result" class="mono"></div>
+      </div>
+
+      <!-- Toy 3: SHA-256 Hasher -->
+      <div class="lab-card glass-card span-12">
+        <h3>SHA-256 Live Hasher</h3>
+        <input type="text" id="hash-input" placeholder="Type anything to see it hash live...">
+        <div class="hash-output mono">
+          Hash: <span id="hash-display">---</span>
+        </div>
+        <div class="blockchain-viz">
+          <!-- Mini blockchain viz -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Cipher Logic
+    document.getElementById('cipher-exec').onclick = () => {
+      const input = document.getElementById('cipher-input').value;
+      const method = document.getElementById('cipher-method').value;
+      let output = '';
+      
+      if (method === 'rot13') {
+        output = input.replace(/[a-zA-Z]/g, c => String.fromCharCode((c <= 'Z' ? 90 : 122) >= (c = c.charCodeAt(0) + 13) ? c : c - 26));
+      } else if (method === 'base64') {
+        output = btoa(input);
+      }
+      document.getElementById('cipher-output').value = output;
+    };
+
+    // ML Predictor (Toy)
+    document.getElementById('ml-predict').onclick = () => {
+      const result = document.getElementById('ml-result');
+      result.textContent = "Analyzing patterns... [Openness: HIGH] [Conscientiousness: HIGH] [Extraversion: MED]";
+    };
+
+    // Live Hash (Simulated)
+    document.getElementById('hash-input').oninput = (e) => {
+      document.getElementById('hash-display').textContent = btoa(e.target.value).substring(0, 32); // Simulating hash for now
+    };
+  </script>
+</body>
+</html>

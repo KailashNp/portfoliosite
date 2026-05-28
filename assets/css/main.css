@@ -1,0 +1,143 @@
+/* main.css - Foundation and Global Variables */
+
+:root {
+  /* ── FOUNDATION ────────────────────────────────── */
+  --void:             #01010A;          /* Deepest black — page base */
+  --deep:             #05050F;          /* Section backgrounds */
+  --surface:          #080818;          /* Card backgrounds */
+  --card:             #0D0D22;          /* Elevated cards */
+  --card-hover:       #121230;          /* Card hover state */
+  --glass:            rgba(8, 8, 24, 0.72); /* Glassmorphism */
+
+  /* ── PRIMARY — BLAUGRANA CRIMSON ───────────────── */
+  --crimson:          #A50044;          /* Pure blaugrana red */
+  --crimson-bright:   #C4005A;          /* Lighter for hover states */
+  --crimson-deep:     #7A0033;          /* Deeper for shadows/borders */
+  --crimson-glow:     rgba(165, 0, 68, 0.30);
+  --crimson-subtle:   rgba(165, 0, 68, 0.08); /* Tinted card backgrounds */
+
+  /* ── SECONDARY — ROYAL BLUE ────────────────────── */
+  --royal:            #004D98;          /* Pure blaugrana blue */
+  --royal-bright:     #0063C6;          /* Lighter for hover */
+  --royal-deep:       #003570;          /* Deeper for borders */
+  --royal-glow:       rgba(0, 77, 152, 0.30);
+  --royal-subtle:     rgba(0, 77, 152, 0.08);
+
+  /* ── THE GRADIENT — Blaugrana Sweep ────────────── */
+  --grad-blaugrana:   linear-gradient(135deg, #A50044 0%, #6B0070 40%, #004D98 100%);
+  --grad-blaugrana-h: linear-gradient(90deg,  #A50044 0%, #004D98 100%);
+  --grad-blaugrana-v: linear-gradient(180deg, #A50044 0%, #004D98 100%);
+  --grad-crimson:     linear-gradient(135deg, #A50044, #7A0033);
+  --grad-royal:       linear-gradient(135deg, #004D98, #003570);
+
+  /* ── ACCENT — Electric Cyan (hacker / terminal) ─ */
+  --cyan:             #00D4FF;
+  --cyan-dim:         #009BBB;
+  --cyan-glow:        rgba(0, 212, 255, 0.20);
+
+  /* ── TERMINAL GREEN ─────────────────────────────── */
+  --terminal:         #00FF9D;
+  --terminal-dim:     #00CC7A;
+  --terminal-glow:    rgba(0, 255, 157, 0.15);
+
+  /* ── STATUS COLORS ──────────────────────────────── */
+  --allow:            #00D48B;          /* ALLOW state — green */
+  --warn:             #FFB800;          /* WARN state — amber */
+  --block:            #FF3B3B;          /* BLOCK state — red */
+
+  /* ── TEXT HIERARCHY ─────────────────────────────── */
+  --text-1:           #F5F0FF;          /* Primary */
+  --text-2:           #B8A8CC;          /* Secondary */
+  --text-3:           #665580;          /* Muted */
+  --text-code:        #00FF9D;          /* Terminal/code text */
+  --text-accent:      #C4005A;          /* Crimson-tinted accent text */
+
+  /* ── BORDERS & GLOWS ────────────────────────────── */
+  --border-default:   rgba(165, 0, 68, 0.15);    /* Subtle crimson border */
+  --border-hover:     rgba(165, 0, 68, 0.45);    /* Hover glow border */
+  --border-royal:     rgba(0, 77, 152, 0.20);    /* Royal blue border variant */
+  --border-cyan:      rgba(0, 212, 255, 0.15);   /* Terminal/code areas */
+
+  /* ── TYPOGRAPHY ─────────────────────────────────── */
+  --font-display:     'Clash Display', sans-serif;
+  --font-body:        'Satoshi', sans-serif;
+  --font-mono:        'JetBrains Mono', monospace;
+  --font-serif:       'DM Serif Display', serif;
+
+  /* ── SPACING ────────────────────────────────────── */
+  --s1: 0.25rem; --s2: 0.5rem; --s3: 0.75rem; --s4: 1rem;
+  --s6: 1.5rem;  --s8: 2rem;   --s12: 3rem;   --s16: 4rem;
+  --s24: 6rem;   --s32: 8rem;
+
+  /* ── EASING ─────────────────────────────────────── */
+  --ease-out-expo:    cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring:      cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-in-out:      cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--void);
+  color: var(--text-1);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.3s var(--ease-out-expo);
+}
+
+ul {
+  list-style: none;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
+
+canvas {
+  display: block;
+}
+
+/* Scrollbar Customization */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--void);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--grad-blaugrana-v);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--crimson-bright);
+}
+
+/* Selection Color */
+::selection {
+  background: var(--crimson);
+  color: white;
+}

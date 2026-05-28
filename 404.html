@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 - Not Found | KNP Portfolio</title>
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+</head>
+<body class="error-page">
+  <div class="flex-center" style="min-height: 100vh; flex-direction: column; text-align: center;">
+    <h1 class="text-gradient" style="font-size: 10rem;">404</h1>
+    <p class="mono">> Error: Route not found. Initiating backtrack...</p>
+    <div id="giphy-404"></div>
+    <a href="index.html" class="btn btn-primary" style="margin-top: var(--s8);">cd ../home</a>
+  </div>
+
+  <script src="assets/js/gif-system.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Trigger 404 GIF reaction
+      if (window.triggerGif) window.triggerGif('on404');
+    });
+  </script>
+</body>
+</html>

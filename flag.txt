@@ -1,0 +1,3 @@
+The signal is found where the noise is quietest.
+Reach out to the source: kailashnprasad@gmail.com
+FLAG{K41l4sh_1s_th3_0n3_wh0_kn0cks}

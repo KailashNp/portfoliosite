@@ -1,0 +1,142 @@
+{
+  "profile": {
+    "name": "Kailash Narayana Prasad",
+    "email": "kailashnprasad@gmail.com",
+    "phone": "+91 9840390269",
+    "location": "Chennai, Tamil Nadu, India",
+    "linkedin": "https://linkedin.com/in/kailash-narayana-prasad",
+    "github": "https://github.com/KailashNp",
+    "education": {
+      "degree": "B.Tech CSE",
+      "institution": "Amity University Noida",
+      "expected": "June 2027",
+      "gpa": "8.82 / 10"
+    },
+    "interests": [
+      "Cybersecurity",
+      "AI/ML",
+      "Cryptography",
+      "Blockchain",
+      "NLP"
+    ],
+    "passion": {
+      "football": "FC Barcelona",
+      "inspiration": "MS Dhoni"
+    },
+    "personality": "Technical precision + creative flair + leadership + calm under fire"
+  },
+  "projects": [
+    {
+      "id": "securewealth-twin",
+      "title": "SecureWealth Twin",
+      "subtitle": "AI-Powered Fraud Interception & Wealth Intelligence",
+      "description": "AI fraud interception platform. Multi-user dashboards, behavioral analytics, real-time ALLOW/WARN/BLOCK decision framework.",
+      "tech": ["React.js", "Node.js", "Express", "Python"],
+      "role": "Team Lead & Fraud Engine Developer",
+      "period": "Mar 2026–present",
+      "mission": "01",
+      "type": "SECURITY",
+      "status": "ACTIVE"
+    },
+    {
+      "id": "personality-prediction",
+      "title": "Text-Based Personality Prediction System",
+      "subtitle": "NLP Research Project",
+      "description": "NLP research project using Logistic Regression, Random Forest, XGBoost, TF-IDF, NLTK, spaCy, scikit-learn.",
+      "tech": ["Logistic Regression", "Random Forest", "XGBoost", "TF-IDF", "NLTK", "spaCy", "scikit-learn"],
+      "role": "Researcher",
+      "period": "Jan–Feb 2026",
+      "mission": "02",
+      "type": "AI/ML"
+    },
+    {
+      "id": "password-manager",
+      "title": "Password Encrypter & Manager using Blockchain + Cryptography",
+      "subtitle": "Secure Data Storage",
+      "description": "AES encryption, SHA-256 hashing, blockchain-based structure.",
+      "tech": ["Python", "AES", "SHA-256", "Blockchain"],
+      "role": "Co-developer",
+      "period": "May–Jul 2025",
+      "mission": "03",
+      "type": "CRYPTO"
+    },
+    {
+      "id": "personality-ml-paper",
+      "title": "Research Paper: Personality Prediction using ML",
+      "subtitle": "Academic Writing",
+      "description": "Academic research paper utilizing SVM, Logistic Regression, Random Forest for personality prediction.",
+      "tech": ["SVM", "Logistic Regression", "Random Forest"],
+      "role": "Author",
+      "period": "May–Aug 2024",
+      "mission": "04",
+      "type": "AI/ML"
+    },
+    {
+      "id": "vikrant-assistant",
+      "title": "Vikrant Assistant",
+      "subtitle": "Voice-Controlled Personal Assistant",
+      "description": "Voice-controlled personal assistant in Python using SpeechRecognition, pyttsx3.",
+      "tech": ["Python", "SpeechRecognition", "pyttsx3"],
+      "role": "Developer",
+      "period": "Jan 2023",
+      "mission": "05",
+      "type": "TOOLS"
+    }
+  ],
+  "leadership": [
+    {
+      "title": "NCC Troop Captain",
+      "location": "Chennai",
+      "period": "Mar 2019–Mar 2023",
+      "description": "Led training, parades, discipline."
+    },
+    {
+      "title": "POLEMIC Debate - Director",
+      "subtitle": "Technical Crew & Video Editor",
+      "period": "Nov 2022–Mar 2023",
+      "description": "Managed technical aspects and video editing."
+    },
+    {
+      "title": "Kurukshetra Cultural Event - Technical Lead",
+      "period": "Jun–Jul 2023",
+      "description": "Managed 20+ schools, 400+ students, LED panels, sound, lighting, AV."
+    }
+  ],
+  "certifications": [
+    {
+      "title": "Cybersecurity Analyst Job Simulation",
+      "issuer": "TCS"
+    },
+    {
+      "title": "Introduction to Networks",
+      "issuer": "Cisco"
+    },
+    {
+      "title": "Python for Data Science",
+      "issuer": "NPTEL"
+    },
+    {
+      "title": "Technical Communication for Engineers",
+      "issuer": "NPTEL"
+    }
+  ],
+  "skills": {
+    "languages": ["C++", "Python", "JavaScript", "C", "Java", "SQL", "MATLAB", "HTML/CSS", "Kotlin"],
+    "security": ["Encryption/Decryption", "Hashing", "Blockchain", "Secure Data Storage"],
+    "mobile": ["Android Studio", "Jetpack Compose", "Kotlin"],
+    "tools": ["Linux", "Git", "GitHub", "macOS", "Windows", "VS Code", "IntelliJ", "PyCharm", "Eclipse", "Android", "iOS"],
+    "multimedia": ["Adobe Premiere Pro", "DaVinci Resolve", "Adobe Audition", "Adobe Photoshop"],
+    "soft_skills": ["Leadership", "Problem-Solving", "DSA", "Pattern Recognition", "Analytical Thinking", "Team Collaboration"]
+  },
+  "config": {
+    "github_token": "YOUR_GITHUB_TOKEN",
+    "repo_name": "portfoliosite",
+    "domain": "kailashnprasad.in",
+    "emailjs": {
+      "service_id": "YOUR_EMAILJS_SERVICE_ID",
+      "template_id": "YOUR_EMAILJS_TEMPLATE_ID",
+      "public_key": "YOUR_EMAILJS_PUBLIC_KEY"
+    },
+    "football_api_key": "YOUR_FOOTBALL_API_KEY"
+  }
+}

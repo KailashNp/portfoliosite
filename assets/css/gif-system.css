@@ -1,0 +1,70 @@
+/* gif-system.css - Cinema Reaction Cards */
+
+.gif-reaction-card {
+  position: fixed;
+  z-index: 5000;
+  width: 250px;
+  background: var(--glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
+  overflow: hidden;
+  padding: 10px;
+  pointer-events: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.gif-reaction-card img {
+  width: 100%;
+  border-radius: 8px;
+  display: block;
+}
+
+.gif-badge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 0.65rem;
+  font-family: var(--font-mono);
+  padding: 2px 8px;
+  border-radius: 4px;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.gif-caption {
+  font-family: var(--font-serif);
+  font-size: 0.9rem;
+  color: var(--text-1);
+  margin-top: 10px;
+  text-align: center;
+  font-style: italic;
+}
+
+.gif-close {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  background: none;
+  border: none;
+  color: var(--text-3);
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+/* Positions */
+.bottom-right { bottom: 30px; right: 30px; }
+.bottom-left { bottom: 30px; left: 30px; }
+.top-right { top: 100px; right: 30px; }
+.center-modal { 
+  top: 50%; left: 50%; 
+  transform: translate(-50%, -50%); 
+}
+
+/* Show Colors */
+.show-suits { background: #001F3F; }
+.show-sherlock-bbc { background: #4B5320; }
+.show-brooklyn-nine-nine { background: #0056B3; }
+.show-better-call-saul { background: #D4AF37; }
+.show-breaking-bad { background: #C0C000; }

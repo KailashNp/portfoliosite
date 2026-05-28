@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KNP Admin Dashboard</title>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <style>
+    body { padding: 40px; }
+    .admin-container { max-width: 1000px; margin: 0 auto; }
+    textarea { width: 100%; height: 600px; font-family: monospace; background: #111; color: #0f0; padding: 20px; border: 1px solid #333; }
+    .actions { margin-top: 20px; display: flex; gap: 20px; }
+  </style>
+</head>
+<body>
+  <div class="admin-container">
+    <h1>Admin Dashboard</h1>
+    <p>Directly edit portfolio.json</p>
+    <textarea id="json-editor"></textarea>
+    <div class="actions">
+      <button id="save-btn" class="btn btn-primary">Save Changes</button>
+      <button id="deploy-btn" class="btn btn-secondary">Deploy to GitHub</button>
+    </div>
+    <div id="status" style="margin-top: 20px;" class="mono"></div>
+  </div>
+
+  <script>
+    const editor = document.getElementById('json-editor');
+    const status = document.getElementById('status');
+
+    // Load current data
+    fetch('../data/portfolio.json')
+      .then(res => res.json())
+      .then(data => {
+        editor.value = JSON.stringify(data, null, 2);
+      });
+
+    document.getElementById('save-btn').onclick = () => {
+      try {
+        JSON.parse(editor.value);
+        status.textContent = "> Saving locally...";
+        // In a real app, this would send a POST request to a backend
+        // For static, we might use localStorage or just simulate
+        status.textContent = "> Saved. (Simulation)";
+      } catch (e) {
+        status.textContent = "> ERROR: Invalid JSON format.";
+      }
+    };
+
+    document.getElementById('deploy-btn').onclick = () => {
+      status.textContent = "> Initiating GitHub deployment workflow...";
+      // Simulate API call to trigger workflow
+    };
+  </script>
+</body>
+</html>
