@@ -29,11 +29,25 @@ section {
 }
 
 .section-label {
+  display: inline-block;
   font-family: var(--font-mono);
   color: var(--terminal);
   font-size: 0.9rem;
   margin-bottom: var(--s2);
-  display: block;
+  background: rgba(0, 77, 152, 0.2);
+  padding: 4px 10px;
+  border-left: 3px solid var(--terminal);
+  border-radius: 0 4px 4px 0;
+  position: relative;
+}
+
+.section-label::after {
+  content: "_";
+  animation: blink 1s step-start infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
 }
 
 .section-title {

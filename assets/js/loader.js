@@ -162,79 +162,219 @@ function createResumeHTML(data) {
 }
 
 function startLoadingSequence() {
-  const bootText = document.getElementById('boot-text');
-  const lines = [
-    "> SYSTEM BOOT v2.0.27 ................................ [OK]",
-    "> Initializing neural interface ..................... [OK]",
-    "> Loading threat signature database ................ [OK]",
-    "> Profile identified: KAILASH NARAYANA PRASAD ...... [OK]",
-    "> Clearance level: AUTHORIZED ...................... [OK]",
-    "> Establishing connection .......................... [OK]",
-    "> Welcome, visitor. ................................ [OK]"
-  ];
-
-  let currentLine = 0;
-  function typeLine() {
-    if (currentLine < lines.length) {
-      const p = document.createElement('p');
-      bootText.appendChild(p);
-      
-      let charIndex = 0;
-      const line = lines[currentLine];
-      
-      const interval = setInterval(() => {
-        p.textContent += line[charIndex];
-        charIndex++;
-        if (charIndex === line.length) {
-          clearInterval(interval);
-          currentLine++;
-          setTimeout(typeLine, 100);
-        }
-      }, 10);
-    } else {
-      setTimeout(revealSite, 500);
-    }
+  const hasVisited = sessionStorage.getItem('knp_visited');
+  const loader = document.getElementById('loader');
+  
+  if (hasVisited) {
+    // Skip to hero with quick fade
+    loader.style.opacity = 0;
+    setTimeout(() => {
+      loader.style.display = 'none';
+      document.body.classList.add('loaded');
+      if (window.startAnimations) window.startAnimations();
+      initFloatingTerminal();
+    }, 200);
+    return;
+  }
+  
+  sessionStorage.setItem('knp_visited', 'true');
+  
+  // PHASE 1: Darkness + Spanish Phrase (0s - 1.2s)
+  const phase1 = document.getElementById('phase1');
+  const phase3 = document.getElementById('phase3');
+  const phase4 = document.getElementById('phase4');
+  const shardsContainer = document.getElementById('loader-shards-container');
+  const innerContent = document.getElementById('loader-content-inner');
+  const canvas = document.getElementById('universe-canvas');
+  const ctx = canvas.getContext('2d');
+  
+  // Resize canvas
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  
+  // Ambient Sound (Sine wave, 60Hz)
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  const oscillator = audioCtx.createOscillator();
+  const gainNode = audioCtx.createGain();
+  oscillator.type = 'sine';
+  oscillator.frequency.value = 60;
+  gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+  oscillator.connect(gainNode);
+  gainNode.connect(audioCtx.destination);
+  oscillator.start();
+  
+  // Particles setup
+  const particles = [];
+  const numParticles = 300;
+  const colors = ['#A50044', '#004D98', '#FFFFFF', '#CCCCCC'];
+  
+  for (let i = 0; i < numParticles; i++) {
+    particles.push({
+      x: canvas.width / 2,
+      y: canvas.height / 2,
+      radius: Math.random() * 2 + 0.5,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      velocity: {
+        x: (Math.random() - 0.5) * (Math.random() * 10),
+        y: (Math.random() - 0.5) * (Math.random() * 10)
+      },
+      alpha: 1
+    });
   }
 
-  typeLine();
-}
+  let animationFrame;
+  let isImploding = false;
 
-function createSkillsBento(skills, container) {
-  // Mapping categories to bento layout
-  const categories = [
-    { name: 'SECURITY', data: skills.security, size: 'span-4' },
-    { name: 'LANGUAGES', data: skills.languages, size: 'span-8' },
-    { name: 'AI/ML/NLP', data: skills.soft_skills, size: 'span-6' }, // Reusing soft skills as placeholder for NLP/ML if not separated
-    { name: 'TOOLS', data: skills.tools, size: 'span-6' }
-  ];
+  function drawParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    particles.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2, false);
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = p.alpha;
+      ctx.fill();
+      
+      if (!isImploding) {
+        p.x += p.velocity.x;
+        p.y += p.velocity.y;
+        p.velocity.x *= 0.98; // friction
+        p.velocity.y *= 0.98;
+        
+        // Circular orbit logic (constellation)
+        const dx = p.x - canvas.width / 2;
+        const dy = p.y - canvas.height / 2;
+        p.x += dy * 0.02;
+        p.y -= dx * 0.02;
+      } else {
+        // Implode towards center
+        p.x += (canvas.width / 2 - p.x) * 0.1;
+        p.y += (canvas.height / 2 - p.y) * 0.1;
+        p.alpha -= 0.05;
+      }
+    });
+    
+    animationFrame = requestAnimationFrame(drawParticles);
+  }
 
-  categories.forEach(cat => {
-    const card = document.createElement('div');
-    card.className = `bento-card glass-card ${cat.size}`;
-    card.innerHTML = `
-      <h4 class="cat-name">${cat.name}</h4>
-      <ul class="cat-list">
-        ${cat.data.map(item => `<li>${item}</li>`).join('')}
-      </ul>
-    `;
-    container.appendChild(card);
-  });
+  // Sequence Timeline
+  // 0s: Fade in Phase 1
+  phase1.classList.remove('hidden');
+  gsap.fromTo(phase1.querySelector('h2'), {opacity: 0}, {opacity: 0.5, duration: 1});
+  gsap.fromTo(phase1.querySelector('p'), {opacity: 0}, {opacity: 0.3, duration: 1, delay: 0.4});
+  
+  // 1.2s: Particle Universe Forms
+  setTimeout(() => {
+    phase1.classList.add('hidden');
+    drawParticles();
+    gainNode.gain.linearRampToValueAtTime(0.08, audioCtx.currentTime + 1);
+    
+    // Page pulse
+    gsap.to(loader, {scale: 1.02, duration: 0.8, yoyo: true, repeat: 1, ease: 'power1.inOut'});
+  }, 1200);
+  
+  // 2.2s: The Quote
+  setTimeout(() => {
+    phase3.classList.remove('hidden');
+    gsap.fromTo(phase3.querySelector('.loader-quote'), {opacity: 0, y: 20}, {opacity: 1, y: 0, duration: 0.8});
+    gsap.fromTo(phase3.querySelector('.loader-quote-line2'), {opacity: 0, y: 20}, {opacity: 1, y: 0, duration: 0.8, delay: 0.5});
+    gsap.fromTo(phase3.querySelector('.loader-attrib'), {opacity: 0}, {opacity: 1, duration: 0.8, delay: 1});
+  }, 2200);
+  
+  // 3.5s: Identity Reveal
+  setTimeout(() => {
+    gsap.to(phase3, {opacity: 0, duration: 0.5, onComplete: () => phase3.classList.add('hidden')});
+    isImploding = true;
+    gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 1);
+    
+    setTimeout(() => {
+      cancelAnimationFrame(animationFrame);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      phase4.classList.remove('hidden');
+      const logoSvg = document.getElementById('knp-loader-svg');
+      const polygon = logoSvg.querySelector('polygon');
+      const length = polygon.getTotalLength();
+      polygon.style.strokeDasharray = length;
+      polygon.style.strokeDashoffset = length;
+      
+      // Draw SVG
+      gsap.to(polygon, {strokeDashoffset: 0, duration: 0.6, ease: 'power2.inOut'});
+      
+      // Type name
+      const nameEl = document.querySelector('.loader-name');
+      const text = "KAILASH NARAYANA PRASAD";
+      nameEl.textContent = '';
+      let charIdx = 0;
+      const typeInt = setInterval(() => {
+        nameEl.textContent += text[charIdx];
+        charIdx++;
+        if (charIdx >= text.length) {
+          clearInterval(typeInt);
+          document.querySelector('.scanline').style.width = '100%';
+          document.querySelector('.scanline').style.opacity = '1';
+        }
+      }, 30);
+    }, 300);
+  }, 3500);
+  
+  // 4.5s: Shatter Reveal
+  setTimeout(() => {
+    phase4.classList.add('hidden');
+    innerContent.style.display = 'none';
+    
+    // Create 12 shards
+    for (let i = 0; i < 12; i++) {
+      const shard = document.createElement('div');
+      shard.className = 'loader-shard';
+      // Random polygons
+      const p1 = `${Math.random()*100}% ${Math.random()*100}%`;
+      const p2 = `${Math.random()*100}% ${Math.random()*100}%`;
+      const p3 = `${Math.random()*100}% ${Math.random()*100}%`;
+      shard.style.clipPath = `polygon(${p1}, ${p2}, ${p3})`;
+      shard.style.backgroundColor = '#0a0a0a';
+      shardsContainer.appendChild(shard);
+      
+      const angle = (Math.PI * 2 * i) / 12;
+      const dist = 500 + Math.random() * 500;
+      
+      gsap.to(shard, {
+        x: Math.cos(angle) * dist,
+        y: Math.sin(angle) * dist,
+        rotation: (Math.random() - 0.5) * 360,
+        opacity: 0,
+        duration: 1.2,
+        delay: i * 0.03,
+        ease: 'power3.out'
+      });
+    }
+    
+    setTimeout(revealSite, 800);
+  }, 4500);
 }
 
 function revealSite() {
   const loader = document.getElementById('loader');
+  loader.style.display = 'none';
+  document.body.classList.add('loaded');
   
-  gsap.to(loader, {
-    opacity: 0,
-    duration: 0.8,
-    ease: "power2.inOut",
-    onComplete: () => {
-      loader.style.display = 'none';
-      document.body.classList.add('loaded');
-      // Trigger animations
-      if (window.startAnimations) window.startAnimations();
-      // Trigger GIPHY reaction
-      if (window.triggerGif) window.triggerGif('onSiteReveal');
-    }
-  });
+  if (window.startAnimations) window.startAnimations();
+  if (window.triggerGif) window.triggerGif('onSiteReveal');
+  initFloatingTerminal();
 }
+
+function initFloatingTerminal() {
+  setTimeout(() => {
+    const toast = document.getElementById('terminal-toast');
+    if (toast) {
+      toast.classList.remove('hidden');
+      toast.classList.add('slide-up');
+      setTimeout(() => {
+        toast.classList.remove('slide-up');
+        toast.classList.add('fade-out');
+        setTimeout(() => toast.style.display = 'none', 500);
+      }, 5000);
+    }
+  }, 3000);
+}
+

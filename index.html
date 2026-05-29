@@ -37,10 +37,62 @@
 
   <!-- 1. LOADING SCREEN -->
   <div id="loader" class="loader-overlay">
-    <div class="loader-content">
-      <div class="terminal-boot" id="boot-text"></div>
-      <div class="loader-visual">
-        <div class="hex-wireframe"></div>
+    <!-- Shards container for clip-path shatter effect -->
+    <div id="loader-shards-container"></div>
+    <div class="loader-content" id="loader-content-inner">
+      <canvas id="universe-canvas"></canvas>
+      
+      <div id="phase1" class="loader-phase hidden">
+        <h2 class="loader-phrase">Más que una pantalla.</h2>
+        <p class="loader-subtitle">More than a portfolio.</p>
+      </div>
+      
+      <div id="phase3" class="loader-phase hidden">
+        <h1 class="loader-quote"><span class="blaugrana-text">The quieter you become,</span></h1>
+        <h1 class="loader-quote-line2">the more you can hear.</h1>
+        <p class="loader-attrib">— Ram Dass</p>
+      </div>
+      
+      <div id="phase4" class="loader-phase hidden">
+        <div class="knp-logo-reveal">
+          <svg id="knp-loader-svg" viewBox="0 0 100 100" width="100" height="100">
+            <polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" fill="none" stroke="#A50044" stroke-width="2"/>
+          </svg>
+          <div class="loader-name">KAILASH NARAYANA PRASAD</div>
+          <div class="scanline"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOATING TERMINAL ELEMENTS -->
+  <div id="terminal-toast" class="terminal-toast hidden">
+    <div class="toast-content">
+      <span class="toast-icon">⌨</span> Press <span>Ctrl + `</span> to open terminal<br>
+      <span class="mobile-hint">(or tap the terminal icon below)</span>
+    </div>
+  </div>
+
+  <button id="floating-terminal-btn" class="floating-terminal-btn" aria-label="Open Terminal">
+    &ge;_
+  </button>
+
+  <div id="floating-terminal-overlay" class="floating-terminal-overlay hidden">
+    <div class="floating-terminal-window">
+      <div class="terminal-header draggable-handle" id="floating-terminal-handle">
+        <div class="terminal-dots">
+          <span class="red" id="close-floating-terminal"></span>
+          <span class="yellow" id="min-floating-terminal"></span>
+          <span class="green" id="max-floating-terminal"></span>
+        </div>
+        <div class="terminal-title">kailash@portfolio: ~</div>
+      </div>
+      <div id="floating-terminal-body" class="terminal-body">
+        <div class="terminal-output" id="floating-terminal-output">Welcome to KNP-OS v2.0. Type 'help' for commands.</div>
+        <div class="terminal-input-line">
+          <span class="prompt">kailash@portfolio:~$</span>
+          <input type="text" id="floating-terminal-input" spellcheck="false" autocomplete="off">
+        </div>
       </div>
     </div>
   </div>
@@ -84,11 +136,10 @@
       <div class="hero-content">
         <div class="hero-label mono">// Kailash Narayana Prasad</div>
         <h1 class="hero-title">
-          Cybersecurity.<br>
-          AI & ML.<br>
-          Systems.
+          KAILASH<br>
+          <span class="blaugrana-text">NARAYANA PRASAD</span>
         </h1>
-        <div class="hero-subtitle">
+        <div class="hero-subtitle terminal-green">
           <span id="typed-text"></span>
         </div>
         <p class="hero-tagline">
@@ -101,8 +152,25 @@
         </div>
       </div>
       <div class="hero-visual">
-        <div class="hex-profile-frame">
-          <img src="assets/images/kailash.webp" alt="Kailash Narayana Prasad" class="profile-img">
+        <div class="hex-profile-container">
+          <svg class="hex-rings" viewBox="0 0 200 200">
+            <polygon class="hex-ring outer-ring" points="100,5 190,52.5 190,147.5 100,195 10,147.5 10,52.5" fill="none" stroke="#A50044" stroke-width="1"/>
+            <polygon class="hex-ring mid-ring" points="100,20 177,65 177,135 100,180 23,135 23,65" fill="none" stroke="#004D98" stroke-width="2"/>
+            <polygon class="hex-ring inner-ring" points="100,35 164,77.5 164,122.5 100,165 36,122.5 36,77.5" fill="none" stroke="#A50044" stroke-width="3"/>
+          </svg>
+          <div class="hex-profile-frame animated-glow">
+            <img src="assets/images/kailash.webp" alt="Kailash Narayana Prasad" class="profile-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <svg class="knp-placeholder" viewBox="0 0 100 100" style="display:none; width:100%; height:100%;">
+              <defs>
+                <linearGradient id="placeholder-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#A50044" />
+                  <stop offset="100%" stop-color="#004D98" />
+                </linearGradient>
+              </defs>
+              <polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" fill="url(#placeholder-grad)"/>
+              <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="var(--font-display)" font-weight="bold" font-size="28" fill="white">KNP</text>
+            </svg>
+          </div>
         </div>
       </div>
     </div>
@@ -126,47 +194,66 @@
   <!-- 4. ABOUT SECTION -->
   <section id="about">
     <div class="container grid-12">
-      <div class="col-left span-5">
-        <div class="about-visual">
-          <div class="hex-frame-static">
-            <!-- img will be here -->
-          </div>
-          <div class="signal-strength">
-            <span class="label">Signal Strength:</span>
-            <div class="bars">
-              <span class="bar active"></span>
-              <span class="bar active"></span>
-              <span class="bar active"></span>
-              <span class="bar active"></span>
-            </div>
-            <span class="status">FULL BARS</span>
-          </div>
-        </div>
-      </div>
-      <div class="col-right span-7">
+      <div class="col-left span-6">
         <span class="section-label">> about.exe</span>
         <h2 class="section-title">The Signal Behind the Noise.</h2>
         <div class="bio-text">
-          <p>I'm Kailash Narayana Prasad — a Computer Science undergrad at Amity University Noida with an 8.82 GPA and a singular obsession: finding the signal in any system's noise.</p>
-          <p>Whether I'm designing a fraud interception engine that makes real-time ALLOW/WARN/BLOCK decisions, building a blockchain-powered password manager, or predicting personality from text using NLP — my work is always about pattern recognition at its deepest level.</p>
+          <p>I'm Kailash Narayana Prasad &mdash; a Computer Science undergrad at Amity University Noida with an 8.82 GPA and a singular obsession: finding the signal in any system's noise.</p>
+          <p>Whether I'm designing a fraud interception engine that makes real-time ALLOW/WARN/BLOCK decisions, building a blockchain-powered password manager, or predicting personality from text using NLP &mdash; my work is always about pattern recognition at its deepest level.</p>
           <p>I've led NCC troops on parade grounds and 20+ school AV productions for 400+ students. Precision under pressure isn't a skill I learned from textbooks.</p>
         </div>
-        <div class="about-stats">
-          <div class="stat-item">
-            <span class="number" data-target="5">0</span>
+      </div>
+      <div class="col-right span-6 flex-column-evenly">
+        <div class="about-visual-right">
+          <div class="hex-profile-container small-hex">
+            <svg class="hex-rings" viewBox="0 0 200 200">
+              <polygon class="hex-ring outer-ring" points="100,5 190,52.5 190,147.5 100,195 10,147.5 10,52.5" fill="none" stroke="#A50044" stroke-width="1"/>
+              <polygon class="hex-ring mid-ring" points="100,20 177,65 177,135 100,180 23,135 23,65" fill="none" stroke="#004D98" stroke-width="2"/>
+              <polygon class="hex-ring inner-ring" points="100,35 164,77.5 164,122.5 100,165 36,122.5 36,77.5" fill="none" stroke="#A50044" stroke-width="3"/>
+            </svg>
+            <div class="hex-profile-frame">
+              <img src="assets/images/kailash.webp" alt="Kailash Narayana Prasad" class="profile-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+              <svg class="knp-placeholder" viewBox="0 0 100 100" style="display:none; width:100%; height:100%;">
+                <defs>
+                  <linearGradient id="placeholder-grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#A50044" />
+                    <stop offset="100%" stop-color="#004D98" />
+                  </linearGradient>
+                </defs>
+                <polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" fill="url(#placeholder-grad2)"/>
+                <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="var(--font-display)" font-weight="bold" font-size="28" fill="white">KNP</text>
+              </svg>
+            </div>
+          </div>
+          <div class="profile-name-small terminal-green mono">KAILASH NARAYANA PRASAD</div>
+        </div>
+
+        <div class="about-stats row-stats">
+          <div class="stat-item glass-card stat-card">
+            <span class="number" data-target="5">0</span><span class="plus">+</span>
             <span class="label">Projects</span>
           </div>
-          <div class="stat-item">
-            <span class="number" data-target="4">0</span>
-            <span class="label">Certifications</span>
+          <div class="stat-item glass-card stat-card">
+            <span class="number" data-target="4">0</span><span class="plus">+</span>
+            <span class="label">Certs</span>
           </div>
-          <div class="stat-item">
+          <div class="stat-item glass-card stat-card">
             <span class="number" data-target="8.82">0</span>
             <span class="label">GPA / 10</span>
           </div>
         </div>
-        <div class="fun-facts-grid">
-          <!-- Fun facts will be injected here -->
+
+        <div class="fun-facts-grid static-grid">
+          <div class="fact-card glass-card"><span class="icon">🔐</span><span class="text">Cybersecurity</span></div>
+          <div class="fact-card glass-card"><span class="icon">🤖</span><span class="text">AI Fraud Detection</span></div>
+          <div class="fact-card glass-card"><span class="icon">🏏</span><span class="text">Dhoni-level composure</span></div>
+          <div class="fact-card glass-card"><span class="icon">⚽</span><span class="text">Un culer para siempre</span></div>
+          <div class="fact-card glass-card"><span class="icon">🎬</span><span class="text">Premiere + DaVinci</span></div>
+          <div class="fact-card glass-card"><span class="icon">🎯</span><span class="text">Making systems unbreakable</span></div>
+        </div>
+
+        <div class="signal-strength terminal-signal mono terminal-green">
+          <span class="label">SIGNAL STRENGTH: FULL BARS ████████████ AVAILABLE</span>
         </div>
       </div>
     </div>
@@ -234,6 +321,7 @@
       <div class="section-header">
         <span class="section-label">> /usr/bin/kailash --interactive</span>
         <h2 class="section-title">Talk to the Terminal</h2>
+        <p class="section-subtitle mono">// You can also open this from anywhere &mdash; press Ctrl + `</p>
       </div>
       <div class="terminal-window">
         <div class="terminal-header">

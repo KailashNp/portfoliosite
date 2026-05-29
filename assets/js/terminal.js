@@ -1,18 +1,26 @@
 /* terminal.js - Advanced Interactive Portfolio Terminal */
 
 document.addEventListener('DOMContentLoaded', () => {
-    const input = document.getElementById('terminal-input');
-    const body = document.getElementById('terminal-body');
-    const terminalWindow = document.querySelector('.terminal-window');
-
-    if (!input || !body) return;
+    // Terminal Instances
+    const terminals = [
+        {
+            input: document.getElementById('terminal-input'),
+            body: document.getElementById('terminal-body'),
+            window: document.querySelector('#terminal-section .terminal-window')
+        },
+        {
+            input: document.getElementById('floating-terminal-input'),
+            body: document.getElementById('floating-terminal-body'),
+            window: document.getElementById('floating-terminal-overlay')
+        }
+    ];
 
     // --- CONFIGURATION ---
     const CHAR_SPEED = 40; // chars per second
     const MAX_LINES = 200;
     const PROMPT = '<span class="prompt">kailash@portfolio:~$</span>';
     
-    // Command History
+    // Shared Command History
     let history = [];
     let historyIndex = -1;
 
@@ -56,18 +64,18 @@ document.addEventListener('DOMContentLoaded', () => {
         whoami: () => {
             const profile = window.portfolioData?.profile;
             return `
-NAME:     ${profile?.name}
+NAME:     ${profile?.name || 'Kailash'}
 ROLE:     Cybersecurity & AI/ML Engineer
 STATUS:   Authorized Access
-BIO:      ${profile?.personality}
-LOC:      ${profile?.location}
+BIO:      ${profile?.personality || 'The signal behind the noise'}
+LOC:      ${profile?.location || 'Chennai / Noida'}
             `.trim();
         },
 
         pwd: () => "/home/kailash/portfolio",
 
         uname: (args) => {
-            if (args.includes('-a')) return "KNP-OS 1.0.0 kailash-portfolio #Signal&Noise SMP";
+            if (args.includes('-a')) return "KNP-OS 2.0.0 kailash-portfolio #Signal&Noise SMP";
             return "KNP-OS";
         },
 
@@ -95,14 +103,14 @@ PID   PROCESS              CPU%
         },
 
         ls: (args) => {
-            if (args[0] === 'projects/') {
+            if (args[0] === 'projects/' && window.portfolioData) {
                 return window.portfolioData.projects.map(p => `[${p.status || 'DONE'}] ${p.title}`).join('\n');
             }
-            if (args[0] === 'skills/') {
+            if (args[0] === 'skills/' && window.portfolioData) {
                 const skills = window.portfolioData.skills;
                 return Object.entries(skills).map(([cat, list]) => `${cat.toUpperCase()}: ${list.slice(0, 3).join(', ')}...`).join('\n');
             }
-            if (args[0] === 'certs/') {
+            if (args[0] === 'certs/' && window.portfolioData) {
                 return window.portfolioData.certifications.map(c => c.title).join('\n');
             }
 
@@ -148,14 +156,14 @@ drwxr-xr-x  contact/
                 scrollToSection(sectionId);
                 return `Navigating to /${dest.replace('/', '')}... done.`;
             }
-
+            
             return `cd: no such directory: ${dest}`;
         },
 
         cat: (args) => {
             const file = args[0];
             if (file === 'flag.txt') return "FLAG{K41l4sh_1s_th3_0n3_wh0_kn0cks}\nThe signal is found where the noise is quietest.";
-            if (file === 'about.txt') return window.portfolioData.profile.personality;
+            if (file === 'about.txt' && window.portfolioData) return window.portfolioData.profile.personality;
             if (file === 'resume.txt') {
                 return `
 KAILASH NARAYANA PRASAD
@@ -238,8 +246,8 @@ Date:   Mar 2026
             return "sudo: command not found";
         },
 
-        vim: () => {
-            input.setAttribute('data-mode', 'vim');
+        vim: (args, terminal) => {
+            terminal.input.setAttribute('data-mode', 'vim');
             return "VIM entered. Type :q to escape.";
         },
 
@@ -263,8 +271,8 @@ AUTHOR: Kailash Narayana Prasad <kailashnprasad@gmail.com>
 
         exit: () => "You can't leave. You haven't hired me yet. 😄",
         
-        clear: () => {
-            body.querySelectorAll('.terminal-output, .terminal-command-line').forEach(e => e.remove());
+        clear: (args, terminal) => {
+            terminal.body.querySelectorAll('.terminal-output, .terminal-command-line').forEach(e => e.remove());
             return null;
         }
     };
@@ -292,7 +300,7 @@ AUTHOR: Kailash Narayana Prasad <kailashnprasad@gmail.com>
         }
     }
 
-    function cleanupHistory() {
+    function cleanupHistory(body) {
         const lines = body.querySelectorAll('.terminal-output, .terminal-command-line');
         if (lines.length > MAX_LINES) {
             for (let i = 0; i < lines.length - MAX_LINES; i++) {
@@ -301,100 +309,204 @@ AUTHOR: Kailash Narayana Prasad <kailashnprasad@gmail.com>
         }
     }
 
-    // --- EVENT HANDLERS ---
+    // --- INIT TERMINALS ---
+    terminals.forEach(terminal => {
+        if (!terminal.input || !terminal.body) return;
 
-    input.addEventListener('keydown', async (e) => {
-        // Tab Autocomplete
-        if (e.key === 'Tab') {
-            e.preventDefault();
-            const val = input.value.trim();
-            if (!val) return;
-            const matches = Object.keys(commands).filter(c => c.startsWith(val));
-            if (matches.length === 1) {
-                input.value = matches[0];
+        terminal.input.addEventListener('keydown', async (e) => {
+            // Tab Autocomplete
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const val = terminal.input.value.trim();
+                if (!val) return;
+                const matches = Object.keys(commands).filter(c => c.startsWith(val));
+                if (matches.length === 1) {
+                    terminal.input.value = matches[0];
+                }
             }
-        }
 
-        // History Navigation
-        if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            if (historyIndex < history.length - 1) {
-                historyIndex++;
-                input.value = history[history.length - 1 - historyIndex];
+            // History Navigation
+            if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (historyIndex < history.length - 1) {
+                    historyIndex++;
+                    terminal.input.value = history[history.length - 1 - historyIndex];
+                }
             }
-        }
-        if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            if (historyIndex > 0) {
-                historyIndex--;
-                input.value = history[history.length - 1 - historyIndex];
-            } else if (historyIndex === 0) {
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (historyIndex > 0) {
+                    historyIndex--;
+                    terminal.input.value = history[history.length - 1 - historyIndex];
+                } else if (historyIndex === 0) {
+                    historyIndex = -1;
+                    terminal.input.value = '';
+                }
+            }
+
+            if (e.key === 'Enter') {
+                const fullCmd = terminal.input.value.trim();
+                terminal.input.value = '';
+                
+                // Vim mode handler
+                if (terminal.input.getAttribute('data-mode') === 'vim') {
+                    if (fullCmd === ':q') {
+                        terminal.input.removeAttribute('data-mode');
+                        const cmdLine = document.createElement('div');
+                        cmdLine.className = 'terminal-command-line';
+                        cmdLine.innerHTML = `<span>:q</span>`;
+                        terminal.body.insertBefore(cmdLine, terminal.input.parentElement);
+                        
+                        const output = document.createElement('div');
+                        output.className = 'terminal-output';
+                        output.textContent = "Smart. Most people are still trapped.";
+                        terminal.body.insertBefore(output, terminal.input.parentElement);
+                        return;
+                    }
+                }
+
+                if (!fullCmd) return;
+
+                // Add to history
+                history.push(fullCmd);
                 historyIndex = -1;
-                input.value = '';
-            }
-        }
 
-        if (e.key === 'Enter') {
-            const fullCmd = input.value.trim();
-            input.value = '';
-            
-            // Vim mode handler
-            if (input.getAttribute('data-mode') === 'vim') {
-                if (fullCmd === ':q') {
-                    input.removeAttribute('data-mode');
-                    const cmdLine = document.createElement('div');
-                    cmdLine.className = 'terminal-command-line';
-                    cmdLine.innerHTML = `<span>:q</span>`;
-                    body.insertBefore(cmdLine, input.parentElement);
-                    
-                    const output = document.createElement('div');
-                    output.className = 'terminal-output';
-                    output.textContent = "Smart. Most people are still trapped.";
-                    body.insertBefore(output, input.parentElement);
-                    return;
+                // Display command
+                const cmdLine = document.createElement('div');
+                cmdLine.className = 'terminal-command-line';
+                cmdLine.innerHTML = `${PROMPT} <span>${fullCmd}</span>`;
+                terminal.body.insertBefore(cmdLine, terminal.input.parentElement);
+
+                const [cmd, ...args] = fullCmd.split(' ');
+                
+                const output = document.createElement('div');
+                output.className = 'terminal-output';
+                terminal.body.insertBefore(output, terminal.input.parentElement);
+
+                if (commands[cmd]) {
+                    const result = commands[cmd](args, terminal);
+                    if (result) {
+                        await typeWriter(result, output);
+                    }
+                } else {
+                    await typeWriter(`command not found: ${cmd}. Type 'help' for available commands.`, output);
                 }
+
+                cleanupHistory(terminal.body);
+                terminal.body.scrollTop = terminal.body.scrollHeight;
             }
+        });
 
-            if (!fullCmd) return;
-
-            // Add to history
-            history.push(fullCmd);
-            historyIndex = -1;
-
-            // Display command
-            const cmdLine = document.createElement('div');
-            cmdLine.className = 'terminal-command-line';
-            cmdLine.innerHTML = `${PROMPT} <span>${fullCmd}</span>`;
-            body.insertBefore(cmdLine, input.parentElement);
-
-            const [cmd, ...args] = fullCmd.split(' ');
-            
-            const output = document.createElement('div');
-            output.className = 'terminal-output';
-            body.insertBefore(output, input.parentElement);
-
-            if (commands[cmd]) {
-                const result = commands[cmd](args);
-                if (result) {
-                    await typeWriter(result, output);
-                }
-            } else {
-                await typeWriter(`command not found: ${cmd}. Type 'help' for available commands.`, output);
-            }
-
-            cleanupHistory();
-            body.scrollTop = body.scrollHeight;
+        // Click to focus
+        if (terminal.window) {
+            terminal.window.addEventListener('click', () => terminal.input.focus());
         }
     });
 
-    // Auto-focus logic
-    const observer = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting) {
-            input.focus();
-        }
-    }, { threshold: 0.5 });
-    observer.observe(terminalWindow);
+    // Auto-focus logic for main terminal
+    const mainTerminalWindow = terminals[0].window;
+    if (mainTerminalWindow) {
+        const observer = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+                terminals[0].input.focus();
+            }
+        }, { threshold: 0.5 });
+        observer.observe(mainTerminalWindow);
+    }
 
-    // Click to focus
-    terminalWindow.addEventListener('click', () => input.focus());
+    // --- FLOATING TERMINAL LOGIC ---
+    const floatingOverlay = document.getElementById('floating-terminal-overlay');
+    const floatingBtn = document.getElementById('floating-terminal-btn');
+    const closeBtn = document.getElementById('close-floating-terminal');
+    const minBtn = document.getElementById('min-floating-terminal');
+    const maxBtn = document.getElementById('max-floating-terminal');
+    const handle = document.getElementById('floating-terminal-handle');
+
+    function openFloatingTerminal() {
+        floatingOverlay.classList.remove('hidden');
+        setTimeout(() => terminals[1].input.focus(), 100);
+    }
+
+    function closeFloatingTerminal() {
+        floatingOverlay.classList.add('hidden');
+    }
+
+    // Toggle shortcut Ctrl + `
+    document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.key === '`') {
+            e.preventDefault();
+            if (floatingOverlay.classList.contains('hidden')) {
+                openFloatingTerminal();
+            } else {
+                closeFloatingTerminal();
+            }
+        }
+        
+        // Esc to close
+        if (e.key === 'Escape' && !floatingOverlay.classList.contains('hidden')) {
+            closeFloatingTerminal();
+        }
+    });
+
+    if (floatingBtn) {
+        floatingBtn.addEventListener('click', openFloatingTerminal);
+    }
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeFloatingTerminal);
+    }
+    
+    if (minBtn) {
+        minBtn.addEventListener('click', closeFloatingTerminal);
+    }
+
+    if (maxBtn) {
+        maxBtn.addEventListener('click', () => {
+            const win = document.querySelector('.floating-terminal-window');
+            win.classList.toggle('maximized');
+        });
+    }
+
+    // Close on click outside
+    if (floatingOverlay) {
+        floatingOverlay.addEventListener('click', (e) => {
+            if (e.target === floatingOverlay) {
+                closeFloatingTerminal();
+            }
+        });
+    }
+
+    // Draggable logic
+    if (handle && floatingOverlay) {
+        let isDragging = false;
+        let startX, startY, initialX, initialY;
+        const win = document.querySelector('.floating-terminal-window');
+
+        handle.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            const rect = win.getBoundingClientRect();
+            initialX = rect.left;
+            initialY = rect.top;
+            startX = e.clientX;
+            startY = e.clientY;
+            win.style.transform = 'none'; // remove centered transform to use absolute positioning
+            win.style.left = initialX + 'px';
+            win.style.top = initialY + 'px';
+            win.style.bottom = 'auto';
+            win.style.right = 'auto';
+            win.style.margin = '0';
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+            win.style.left = (initialX + dx) + 'px';
+            win.style.top = (initialY + dy) + 'px';
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+    }
 });

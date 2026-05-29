@@ -5,7 +5,58 @@ document.addEventListener('DOMContentLoaded', () => {
   initNavigation();
   initTyped();
   initLenis();
+  initAmbientShapes();
 });
+
+// Ambient Geometric Shapes
+function initAmbientShapes() {
+  const sections = document.querySelectorAll('section');
+  const colors = ['#A50044', '#004D98'];
+  
+  sections.forEach(sec => {
+    // Add 2-3 shapes per section
+    const numShapes = Math.floor(Math.random() * 2) + 2;
+    for (let i=0; i<numShapes; i++) {
+      const size = 200 + Math.random() * 200;
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      
+      svg.setAttribute('viewBox', '0 0 200 200');
+      svg.style.position = 'absolute';
+      svg.style.width = size + 'px';
+      svg.style.height = size + 'px';
+      svg.style.top = Math.random() * 80 + 10 + '%';
+      svg.style.left = Math.random() * 80 + 10 + '%';
+      svg.style.opacity = '0.04';
+      svg.style.zIndex = '-1';
+      svg.style.pointerEvents = 'none';
+      svg.style.animation = `floatShape ${8 + Math.random() * 4}s ease-in-out infinite alternate`;
+      svg.style.animationDelay = `${Math.random() * -5}s`;
+      
+      const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+      polygon.setAttribute('points', '100,5 190,52.5 190,147.5 100,195 10,147.5 10,52.5');
+      polygon.setAttribute('fill', 'none');
+      polygon.setAttribute('stroke', color);
+      polygon.setAttribute('stroke-width', '2');
+      
+      svg.appendChild(polygon);
+      sec.appendChild(svg);
+    }
+  });
+
+  // Inject keyframes if not exists
+  if (!document.getElementById('ambient-keyframes')) {
+    const style = document.createElement('style');
+    style.id = 'ambient-keyframes';
+    style.textContent = `
+      @keyframes floatShape {
+        0% { transform: translateY(-20px) rotate(0deg); }
+        100% { transform: translateY(20px) rotate(15deg); }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+}
 
 // IST Clock
 function initClock() {
@@ -74,8 +125,8 @@ function initNavigation() {
 function initTyped() {
   const options = {
     strings: [
-      "Fraud Interception Engineer.",
-      "NLP Researcher.",
+      "Cybersecurity Engineer.",
+      "AI & ML Researcher.",
       "Blockchain Developer.",
       "NCC Troop Captain.",
       "Future CISO."
@@ -112,21 +163,31 @@ function initLenis() {
 
 // Export startAnimations for loader.js
 window.startAnimations = function() {
-  // GSAP animations for entry
-  gsap.from(".hero-title", {
-    y: 100,
-    opacity: 0,
-    duration: 1,
-    stagger: 0.2,
-    ease: "power4.out"
-  });
+  // Split text for hero title
+  if (window.Splitting) {
+    Splitting({ target: '.hero-title', by: 'chars' });
+    gsap.from(".hero-title .char", {
+      opacity: 0,
+      y: 20,
+      duration: 0.5,
+      stagger: 0.02,
+      ease: "power2.out"
+    });
+  } else {
+    gsap.from(".hero-title", {
+      y: 50,
+      opacity: 0,
+      duration: 1,
+      ease: "power4.out"
+    });
+  }
 
-  gsap.from(".hero-content > *", {
+  gsap.from(".hero-content > *:not(.hero-title)", {
     x: -50,
     opacity: 0,
     duration: 0.8,
     stagger: 0.1,
-    delay: 0.5,
+    delay: 0.3,
     ease: "power3.out"
   });
 
@@ -134,7 +195,17 @@ window.startAnimations = function() {
     scale: 0.8,
     opacity: 0,
     duration: 1.2,
-    delay: 0.8,
+    delay: 0.5,
     ease: "elastic.out(1, 0.75)"
+  });
+
+  // CTA buttons sliding up
+  gsap.from(".hero-actions .btn", {
+    y: 30,
+    opacity: 0,
+    duration: 0.6,
+    stagger: 0.1,
+    delay: 0.8,
+    ease: "back.out(1.5, 0.7)"
   });
 };

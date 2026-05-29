@@ -1,93 +1,170 @@
-/* gif-system.js - Contextual Cinema Reactions Engine */
+/* gif-system.js - Contextual GIPHY Reaction System */
 
-const GIF_MOMENTS = {
-  onSiteReveal: {
-    query: "suits harvey specter impressive",
-    caption: '"Impressive." — Harvey Specter',
-    show: "Suits",
-    trigger: "loading-complete",
-    position: "bottom-right",
-    duration: 3500
-  },
-  onTypingComplete: {
-    query: "sherlock benedict cumberbatch brilliant",
-    caption: '"Oh, this is brilliant." — Sherlock',
-    show: "Sherlock BBC",
-    trigger: "typing-complete",
-    position: "bottom-right",
-    duration: 3000
-  },
-  onContactSuccess: {
-    query: "brooklyn nine nine cool cool cool",
-    caption: '"Cool cool cool cool cool." — Jake Peralta',
-    show: "Brooklyn Nine-Nine",
-    trigger: "form-success",
-    position: "bottom-right",
-    duration: 4000
-  },
-  onMenuOpen: {
-    query: "better call saul door open",
-    caption: '"After you." — Saul Goodman',
-    show: "Better Call Saul",
-    trigger: "menu-open",
-    once: true,
-    position: "top-right",
-    duration: 2500
-  },
-  onTerminalOpen: {
-    query: "sherlock deducing fast",
-    caption: '"Elementary." — Sherlock Holmes',
-    show: "Sherlock BBC",
-    trigger: "terminal-open",
-    position: "bottom-left",
-    duration: 3000
-  }
-};
+class GifReaction {
+    constructor() {
+        this.container = null;
+        this.queue = [];
+        this.active = false;
+        this.triggered = new Set();
+        this.apiKey = window.portfolioData?.apis?.giphy || null;
+        
+        this.fallbacks = {
+            onSiteReveal: "https://media.giphy.com/media/3o7TKP9ln2Dr6ze6f6/giphy.gif",
+            onContactSuccess: "https://media.giphy.com/media/OK27wINdQS5YQ/giphy.gif",
+            onContactError: "https://media.giphy.com/media/26n6Gx9moCgs1pUuk/giphy.gif",
+            on404: "https://media.giphy.com/media/l0HlvtIPzPdt2usKs/giphy.gif",
+            onResumeDownload: "https://media.giphy.com/media/3oKIPnAiaMCws8nOsE/giphy.gif",
+            onSkillsReveal: "https://media.giphy.com/media/xT9IgzoKnwFNmISR8I/giphy.gif",
+            onProjectHover: "https://media.giphy.com/media/13HgwGsXF0aiGY/giphy.gif",
+            onLongDwell: "https://media.giphy.com/media/l2JHVUriDGEtWOx0c/giphy.gif",
+            onFullScroll: "https://media.giphy.com/media/xT0xeJpnrWC4XWblEk/giphy.gif"
+        };
+        
+        this.init();
+    }
 
-const GIPHY_API_KEY = 'YOUR_GIPHY_API_KEY_HERE'; // Will be replaced by loader data
+    init() {
+        this.container = document.createElement('div');
+        this.container.id = 'gif-reaction-container';
+        document.body.appendChild(this.container);
+        
+        // Expose to window so other scripts can call it
+        window.triggerGif = (moment) => this.trigger(moment);
+        
+        this.setupTriggers();
+    }
+    
+    setupTriggers() {
+        // Resume Download
+        const resumeBtns = document.querySelectorAll('a[download]');
+        resumeBtns.forEach(btn => {
+            btn.addEventListener('click', () => this.trigger('onResumeDownload', 'Downloading data...'));
+        });
+        
+        // Intersection Observers
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    if (entry.target.id === 'arsenal') {
+                        this.trigger('onSkillsReveal', 'Loading arsenal...');
+                    }
+                    if (entry.target.id === 'footer') {
+                        this.trigger('onFullScroll', 'End of line.');
+                    }
+                }
+            });
+        }, { threshold: 0.5 });
+        
+        const arsenal = document.getElementById('arsenal');
+        const footer = document.getElementById('footer');
+        if (arsenal) observer.observe(arsenal);
+        if (footer) observer.observe(footer);
+        
+        // Hover on projects
+        const delegateProjectHover = (e) => {
+            if (e.target.closest('.project-card')) {
+                this.trigger('onProjectHover', 'Analyzing architecture...');
+                document.removeEventListener('mouseover', delegateProjectHover);
+            }
+        };
+        document.addEventListener('mouseover', delegateProjectHover);
+        
+        // Long dwell time
+        setTimeout(() => {
+            this.trigger('onLongDwell', 'Still there?');
+        }, 240000); // 4 minutes
+    }
 
-window.triggerGif = function(momentKey) {
-  const moment = GIF_MOMENTS[momentKey];
-  if (!moment) return;
-  if (moment.once && moment.triggered) return;
+    async trigger(moment, text = '') {
+        if (this.triggered.has(moment)) return;
+        this.triggered.add(moment);
+        
+        this.queue.push({ moment, text });
+        if (!this.active) {
+            this.processQueue();
+        }
+    }
 
-  const apiKey = window.portfolioData?.config?.giphy_api_key || 'dc6zaTOxFJmzC'; // Fallback to public beta key
-  const url = `https://api.giphy.com/v1/gifs/search?api_key=${apiKey}&q=${encodeURIComponent(moment.query)}&limit=1&rating=g`;
+    async processQueue() {
+        if (this.queue.length === 0) {
+            this.active = false;
+            return;
+        }
+        
+        this.active = true;
+        const current = this.queue.shift();
+        
+        await this.show(current);
+        
+        setTimeout(() => {
+            this.processQueue();
+        }, 500); // Wait between GIFs
+    }
 
-  fetch(url)
-    .then(response => response.json())
-    .then(data => {
-      if (data.data && data.data.length > 0) {
-        showGifCard(data.data[0].images.fixed_width.url, moment);
-        moment.triggered = true;
-      }
-    })
-    .catch(error => console.error('Giphy error:', error));
-};
-
-function showGifCard(gifUrl, moment) {
-  const card = document.createElement('div');
-  card.className = `gif-reaction-card ${moment.position}`;
-  card.innerHTML = `
-    <div class="gif-badge show-${moment.show.replace(/\s+/g, '-').toLowerCase()}">${moment.show}</div>
-    <img src="${gifUrl}" alt="Reaction">
-    <div class="gif-caption">${moment.caption}</div>
-    <button class="gif-close">×</button>
-  `;
-  
-  document.body.appendChild(card);
-
-  // Animate in
-  gsap.fromTo(card, { y: 50, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power2.out" });
-
-  const closeBtn = card.querySelector('.gif-close');
-  closeBtn.onclick = () => dismissCard(card);
-
-  if (moment.duration > 0) {
-    setTimeout(() => dismissCard(card), moment.duration);
-  }
+    async show({ moment, text }) {
+        let gifUrl = this.fallbacks[moment] || this.fallbacks.onSiteReveal;
+        
+        if (this.apiKey) {
+            try {
+                // Determine query based on moment
+                let query = 'hacker';
+                if (moment === 'onContactSuccess') query = 'success';
+                else if (moment === 'onContactError') query = 'error';
+                else if (moment === 'onResumeDownload') query = 'download matrix';
+                else if (moment === 'onFullScroll') query = 'mind blown';
+                
+                const response = await fetch(`https://api.giphy.com/v1/gifs/random?api_key=${this.apiKey}&tag=${encodeURIComponent(query)}&rating=g`);
+                
+                // timeout control
+                const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 2000));
+                
+                const data = await Promise.race([response.json(), timeoutPromise]);
+                if (data && data.data && data.data.images) {
+                    gifUrl = data.data.images.downsized_medium.url;
+                }
+            } catch (err) {
+                console.warn('Giphy API failed or timed out, using fallback.', err);
+                // Fallback URL already assigned
+            }
+        }
+        
+        return new Promise((resolve) => {
+            const card = document.createElement('div');
+            card.className = 'gif-reaction-card glass-card slide-up';
+            
+            card.innerHTML = `
+                <div class="gif-header">
+                    <span class="gif-dot red"></span>
+                    <span class="gif-title">Reaction // ${moment}</span>
+                    <button class="gif-close">&times;</button>
+                </div>
+                <div class="gif-body">
+                    <img src="${gifUrl}" alt="Reaction GIF" class="gif-img">
+                    ${text ? `<div class="gif-text mono">${text}</div>` : ''}
+                </div>
+            `;
+            
+            this.container.appendChild(card);
+            
+            const closeBtn = card.querySelector('.gif-close');
+            let dismissTimeout;
+            
+            const dismiss = () => {
+                clearTimeout(dismissTimeout);
+                card.classList.remove('slide-up');
+                card.classList.add('fade-out');
+                setTimeout(() => {
+                    if(card.parentNode) card.remove();
+                    resolve();
+                }, 400);
+            };
+            
+            closeBtn.addEventListener('click', dismiss);
+            dismissTimeout = setTimeout(dismiss, 6000);
+        });
+    }
 }
 
-function dismissCard(card) {
-  gsap.to(card, { y: 50, opacity: 0, duration: 0.5, ease: "power2.in", onComplete: () => card.remove() });
-}
+document.addEventListener('DOMContentLoaded', () => {
+    window.gifSystem = new GifReaction();
+});
