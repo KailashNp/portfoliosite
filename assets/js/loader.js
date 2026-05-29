@@ -1,5 +1,10 @@
 /* loader.js - Portfolio Data Loading and Initial Setup */
 
+// Point 7: Clear old cached states to ensure the fixed loader plays
+sessionStorage.removeItem('knp_visited');
+sessionStorage.removeItem('portfolioLoaded');
+sessionStorage.removeItem('loaderShown');
+
 document.addEventListener('DOMContentLoaded', () => {
   fetch('data/portfolio.json')
     .then(response => response.json())
@@ -10,78 +15,85 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     .catch(error => {
       console.error('Error loading portfolio data:', error);
-      // Fallback or error message
+      // Failsafe: start loading anyway
+      startLoadingSequence();
     });
 });
 
 function initializeApp(data) {
-  const { profile, projects, leadership, certifications, skills } = data;
+  try {
+    const { profile, projects, leadership, certifications, skills } = data;
 
-  // Set Page Title and Meta
-  document.title = `${profile.name} — Cybersecurity & AI/ML Engineer`;
+    // Set Page Title and Meta
+    document.title = `${profile.name} — Cybersecurity & AI/ML Engineer`;
 
-  // Populate Hero
-  // (Typed.js handled in main.js)
+    // Populate About
+    const statNumbers = document.querySelectorAll('.stat-item .number');
+    if (statNumbers.length >= 3) {
+      statNumbers[0].setAttribute('data-target', projects.length);
+      statNumbers[1].setAttribute('data-target', certifications.length);
+      statNumbers[2].setAttribute('data-target', parseFloat(profile.education.gpa));
+    }
 
-  // Populate About
-  const statNumbers = document.querySelectorAll('.stat-item .number');
-  statNumbers[0].setAttribute('data-target', projects.length);
-  statNumbers[1].setAttribute('data-target', certifications.length);
-  statNumbers[2].setAttribute('data-target', parseFloat(profile.education.gpa));
+    // Populate Projects (Operations)
+    const projectsGrid = document.getElementById('projects-grid');
+    if (projectsGrid) {
+      projectsGrid.innerHTML = '';
+      projects.forEach(project => {
+        const projectCard = createProjectCard(project);
+        projectsGrid.appendChild(projectCard);
+      });
+    }
 
-  // Populate Projects (Operations)
-  const projectsGrid = document.getElementById('projects-grid');
-  if (projectsGrid) {
-    projects.forEach(project => {
-      const projectCard = createProjectCard(project);
-      projectsGrid.appendChild(projectCard);
-    });
-  }
+    // Populate Skills (Arsenal)
+    const skillsBento = document.getElementById('skills-bento');
+    if (skillsBento) {
+      skillsBento.innerHTML = '';
+      createSkillsBento(skills, skillsBento);
+    }
+    
+    // Populate Timeline (Journey)
+    const timelineItems = document.getElementById('timeline-items');
+    if (timelineItems) {
+      timelineItems.innerHTML = '';
+      const events = [
+        ...leadership.map(l => ({ ...l, type: 'experience' })),
+        {
+          title: profile.education.degree,
+          subtitle: profile.education.institution,
+          period: `2023–${profile.education.expected.split(' ')[1]}`,
+          description: `GPA: ${profile.education.gpa} | Expected: ${profile.education.expected}`,
+          type: 'education'
+        }
+      ].sort((a, b) => {
+        const yearA = parseInt(a.period.split('–')[0]) || 0;
+        const yearB = parseInt(b.period.split('–')[0]) || 0;
+        return yearB - yearA;
+      });
 
-  // Populate Skills (Arsenal)
-  const skillsBento = document.getElementById('skills-bento');
-  if (skillsBento) {
-    createSkillsBento(skills, skillsBento);
-  }
-  
-  // Populate Timeline (Journey)
-  const timelineItems = document.getElementById('timeline-items');
-  if (timelineItems) {
-    // Merge leadership and education into a timeline
-    const events = [
-      ...leadership.map(l => ({ ...l, type: 'experience' })),
-      {
-        title: profile.education.degree,
-        subtitle: profile.education.institution,
-        period: `2023–${profile.education.expected.split(' ')[1]}`,
-        description: `GPA: ${profile.education.gpa} | Expected: ${profile.education.expected}`,
-        type: 'education'
-      }
-    ].sort((a, b) => {
-      const yearA = parseInt(a.period.split('–')[0]) || 0;
-      const yearB = parseInt(b.period.split('–')[0]) || 0;
-      return yearB - yearA;
-    });
+      events.forEach(event => {
+        const item = createTimelineItem(event);
+        timelineItems.appendChild(item);
+      });
+    }
 
-    events.forEach(event => {
-      const item = createTimelineItem(event);
-      timelineItems.appendChild(item);
-    });
-  }
+    // Populate Certifications
+    const certsContainer = document.getElementById('certs-container');
+    if (certsContainer) {
+      certsContainer.innerHTML = '';
+      certifications.forEach(cert => {
+        const certCard = createCertCard(cert);
+        certsContainer.appendChild(certCard);
+      });
+    }
 
-  // Populate Certifications
-  const certsContainer = document.getElementById('certs-container');
-  if (certsContainer) {
-    certifications.forEach(cert => {
-      const certCard = createCertCard(cert);
-      certsContainer.appendChild(certCard);
-    });
-  }
-
-  // Populate Resume Preview
-  const resumeContent = document.getElementById('resume-content');
-  if (resumeContent) {
-    resumeContent.innerHTML = createResumeHTML(data);
+    // Populate Resume Preview
+    const resumeContent = document.getElementById('resume-content');
+    if (resumeContent) {
+      resumeContent.innerHTML = createResumeHTML(data);
+    }
+  } catch (e) {
+    console.error('App initialization failed:', e);
   }
 }
 
@@ -161,206 +173,280 @@ function createResumeHTML(data) {
   `;
 }
 
+function createSkillsBento(skills, container) {
+  const categories = [
+    { name: 'SECURITY', data: skills.security, size: 'span-4' },
+    { name: 'LANGUAGES', data: skills.languages, size: 'span-8' },
+    { name: 'AI/ML/NLP', data: skills.soft_skills, size: 'span-6' },
+    { name: 'TOOLS', data: skills.tools, size: 'span-6' }
+  ];
+
+  categories.forEach(cat => {
+    const card = document.createElement('div');
+    card.className = `bento-card glass-card ${cat.size}`;
+    card.innerHTML = `
+      <h4 class="cat-name">${cat.name}</h4>
+      <ul class="cat-list">
+        ${cat.data.map(item => `<li>${item}</li>`).join('')}
+      </ul>
+    `;
+    container.appendChild(card);
+  });
+}
+
 function startLoadingSequence() {
-  const hasVisited = sessionStorage.getItem('knp_visited');
-  const loader = document.getElementById('loader');
-  
-  if (hasVisited) {
-    // Skip to hero with quick fade
-    loader.style.opacity = 0;
-    setTimeout(() => {
-      loader.style.display = 'none';
-      document.body.classList.add('loaded');
-      if (window.startAnimations) window.startAnimations();
-      initFloatingTerminal();
-    }, 200);
-    return;
-  }
-  
-  sessionStorage.setItem('knp_visited', 'true');
-  
-  // PHASE 1: Darkness + Spanish Phrase (0s - 1.2s)
-  const phase1 = document.getElementById('phase1');
-  const phase3 = document.getElementById('phase3');
-  const phase4 = document.getElementById('phase4');
-  const shardsContainer = document.getElementById('loader-shards-container');
-  const innerContent = document.getElementById('loader-content-inner');
-  const canvas = document.getElementById('universe-canvas');
-  const ctx = canvas.getContext('2d');
-  
-  // Resize canvas
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  
-  // Ambient Sound (Sine wave, 60Hz)
-  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  const oscillator = audioCtx.createOscillator();
-  const gainNode = audioCtx.createGain();
-  oscillator.type = 'sine';
-  oscillator.frequency.value = 60;
-  gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-  oscillator.connect(gainNode);
-  gainNode.connect(audioCtx.destination);
-  oscillator.start();
-  
-  // Particles setup
-  const particles = [];
-  const numParticles = 300;
-  const colors = ['#A50044', '#004D98', '#FFFFFF', '#CCCCCC'];
-  
-  for (let i = 0; i < numParticles; i++) {
-    particles.push({
-      x: canvas.width / 2,
-      y: canvas.height / 2,
-      radius: Math.random() * 2 + 0.5,
-      color: colors[Math.floor(Math.random() * colors.length)],
-      velocity: {
-        x: (Math.random() - 0.5) * (Math.random() * 10),
-        y: (Math.random() - 0.5) * (Math.random() * 10)
-      },
-      alpha: 1
-    });
-  }
-
-  let animationFrame;
-  let isImploding = false;
-
-  function drawParticles() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  console.log('Loader start: Checking state');
+  try {
+    const hasVisited = sessionStorage.getItem('knp_visited');
+    const loader = document.getElementById('loader');
     
-    particles.forEach(p => {
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2, false);
-      ctx.fillStyle = p.color;
-      ctx.globalAlpha = p.alpha;
-      ctx.fill();
-      
-      if (!isImploding) {
-        p.x += p.velocity.x;
-        p.y += p.velocity.y;
-        p.velocity.x *= 0.98; // friction
-        p.velocity.y *= 0.98;
-        
-        // Circular orbit logic (constellation)
-        const dx = p.x - canvas.width / 2;
-        const dy = p.y - canvas.height / 2;
-        p.x += dy * 0.02;
-        p.y -= dx * 0.02;
-      } else {
-        // Implode towards center
-        p.x += (canvas.width / 2 - p.x) * 0.1;
-        p.y += (canvas.height / 2 - p.y) * 0.1;
-        p.alpha -= 0.05;
-      }
-    });
-    
-    animationFrame = requestAnimationFrame(drawParticles);
-  }
-
-  // Sequence Timeline
-  // 0s: Fade in Phase 1
-  phase1.classList.remove('hidden');
-  gsap.fromTo(phase1.querySelector('h2'), {opacity: 0}, {opacity: 0.5, duration: 1});
-  gsap.fromTo(phase1.querySelector('p'), {opacity: 0}, {opacity: 0.3, duration: 1, delay: 0.4});
-  
-  // 1.2s: Particle Universe Forms
-  setTimeout(() => {
-    phase1.classList.add('hidden');
-    drawParticles();
-    gainNode.gain.linearRampToValueAtTime(0.08, audioCtx.currentTime + 1);
-    
-    // Page pulse
-    gsap.to(loader, {scale: 1.02, duration: 0.8, yoyo: true, repeat: 1, ease: 'power1.inOut'});
-  }, 1200);
-  
-  // 2.2s: The Quote
-  setTimeout(() => {
-    phase3.classList.remove('hidden');
-    gsap.fromTo(phase3.querySelector('.loader-quote'), {opacity: 0, y: 20}, {opacity: 1, y: 0, duration: 0.8});
-    gsap.fromTo(phase3.querySelector('.loader-quote-line2'), {opacity: 0, y: 20}, {opacity: 1, y: 0, duration: 0.8, delay: 0.5});
-    gsap.fromTo(phase3.querySelector('.loader-attrib'), {opacity: 0}, {opacity: 1, duration: 0.8, delay: 1});
-  }, 2200);
-  
-  // 3.5s: Identity Reveal
-  setTimeout(() => {
-    gsap.to(phase3, {opacity: 0, duration: 0.5, onComplete: () => phase3.classList.add('hidden')});
-    isImploding = true;
-    gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 1);
-    
-    setTimeout(() => {
-      cancelAnimationFrame(animationFrame);
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      phase4.classList.remove('hidden');
-      const logoSvg = document.getElementById('knp-loader-svg');
-      const polygon = logoSvg.querySelector('polygon');
-      const length = polygon.getTotalLength();
-      polygon.style.strokeDasharray = length;
-      polygon.style.strokeDashoffset = length;
-      
-      // Draw SVG
-      gsap.to(polygon, {strokeDashoffset: 0, duration: 0.6, ease: 'power2.inOut'});
-      
-      // Type name
-      const nameEl = document.querySelector('.loader-name');
-      const text = "KAILASH NARAYANA PRASAD";
-      nameEl.textContent = '';
-      let charIdx = 0;
-      const typeInt = setInterval(() => {
-        nameEl.textContent += text[charIdx];
-        charIdx++;
-        if (charIdx >= text.length) {
-          clearInterval(typeInt);
-          document.querySelector('.scanline').style.width = '100%';
-          document.querySelector('.scanline').style.opacity = '1';
-        }
-      }, 30);
-    }, 300);
-  }, 3500);
-  
-  // 4.5s: Shatter Reveal
-  setTimeout(() => {
-    phase4.classList.add('hidden');
-    innerContent.style.display = 'none';
-    
-    // Create 12 shards
-    for (let i = 0; i < 12; i++) {
-      const shard = document.createElement('div');
-      shard.className = 'loader-shard';
-      // Random polygons
-      const p1 = `${Math.random()*100}% ${Math.random()*100}%`;
-      const p2 = `${Math.random()*100}% ${Math.random()*100}%`;
-      const p3 = `${Math.random()*100}% ${Math.random()*100}%`;
-      shard.style.clipPath = `polygon(${p1}, ${p2}, ${p3})`;
-      shard.style.backgroundColor = '#0a0a0a';
-      shardsContainer.appendChild(shard);
-      
-      const angle = (Math.PI * 2 * i) / 12;
-      const dist = 500 + Math.random() * 500;
-      
-      gsap.to(shard, {
-        x: Math.cos(angle) * dist,
-        y: Math.sin(angle) * dist,
-        rotation: (Math.random() - 0.5) * 360,
-        opacity: 0,
-        duration: 1.2,
-        delay: i * 0.03,
-        ease: 'power3.out'
-      });
+    if (hasVisited) {
+      console.log('Loader: skipping cinematic (returning visitor)');
+      revealSite();
+      return;
     }
     
-    setTimeout(revealSite, 800);
-  }, 4500);
+    sessionStorage.setItem('knp_visited', 'true');
+    console.log('Loader phase 1: darkness');
+    
+    const phase1 = document.getElementById('phase1');
+    const phase3 = document.getElementById('phase3');
+    const phase4 = document.getElementById('phase4');
+    const shardsContainer = document.getElementById('loader-shards-container');
+    const innerContent = document.getElementById('loader-content-inner');
+    const canvas = document.getElementById('universe-canvas');
+    
+    let ctx, oscillator, gainNode;
+
+    // Optional Audio (Point 4)
+    try {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (AudioContext) {
+        const audioCtx = new AudioContext();
+        oscillator = audioCtx.createOscillator();
+        gainNode = audioCtx.createGain();
+        oscillator.type = 'sine';
+        oscillator.frequency.value = 60;
+        gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        // Start but silent, may fail without gesture
+        oscillator.start();
+      }
+    } catch (e) {
+      console.warn('Web Audio API not supported or blocked:', e);
+    }
+    
+    // Optional Canvas (Point 5)
+    let particles = [];
+    let animationFrame;
+    let isImploding = false;
+
+    if (canvas) {
+      try {
+        ctx = canvas.getContext('2d');
+        if (ctx) {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+          
+          const numParticles = 300;
+          const colors = ['#A50044', '#004D98', '#FFFFFF', '#CCCCCC'];
+          for (let i = 0; i < numParticles; i++) {
+            particles.push({
+              x: canvas.width / 2,
+              y: canvas.height / 2,
+              radius: Math.random() * 2 + 0.5,
+              color: colors[Math.floor(Math.random() * colors.length)],
+              velocity: {
+                x: (Math.random() - 0.5) * (Math.random() * 10),
+                y: (Math.random() - 0.5) * (Math.random() * 10)
+              },
+              alpha: 1
+            });
+          }
+        } else {
+          console.warn('Canvas 2D context not available');
+        }
+      } catch (e) {
+        console.error('Canvas setup failed:', e);
+      }
+    }
+
+    function drawParticles() {
+      if (!ctx) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      particles.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2, false);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha;
+        ctx.fill();
+        
+        if (!isImploding) {
+          p.x += p.velocity.x;
+          p.y += p.velocity.y;
+          p.velocity.x *= 0.98;
+          p.velocity.y *= 0.98;
+          const dx = p.x - canvas.width / 2;
+          const dy = p.y - canvas.height / 2;
+          p.x += dy * 0.02;
+          p.y -= dx * 0.02;
+        } else {
+          p.x += (canvas.width / 2 - p.x) * 0.1;
+          p.y += (canvas.height / 2 - p.y) * 0.1;
+          p.alpha -= 0.05;
+        }
+      });
+      animationFrame = requestAnimationFrame(drawParticles);
+    }
+
+    // Sequence Timeline
+    if (phase1) {
+      phase1.classList.remove('hidden');
+      gsap.fromTo(phase1.querySelector('h2'), {opacity: 0}, {opacity: 0.5, duration: 1});
+      gsap.fromTo(phase1.querySelector('p'), {opacity: 0}, {opacity: 0.3, duration: 1, delay: 0.4});
+    }
+    
+    // 1.2s: Particle Universe Forms
+    setTimeout(() => {
+      console.log('Loader phase 2: particles');
+      if (phase1) phase1.classList.add('hidden');
+      if (ctx) drawParticles();
+      
+      if (gainNode) {
+        try { gainNode.gain.linearRampToValueAtTime(0.08, 1); } catch(e){}
+      }
+      
+      if (loader) gsap.to(loader, {scale: 1.02, duration: 0.8, yoyo: true, repeat: 1, ease: 'power1.inOut'});
+    }, 1200);
+    
+    // 2.2s: The Quote
+    setTimeout(() => {
+      console.log('Loader phase 3: quote');
+      if (phase3) {
+        phase3.classList.remove('hidden');
+        gsap.fromTo(phase3.querySelector('.loader-quote'), {opacity: 0, y: 20}, {opacity: 1, y: 0, duration: 0.8});
+        gsap.fromTo(phase3.querySelector('.loader-quote-line2'), {opacity: 0, y: 20}, {opacity: 1, y: 0, duration: 0.8, delay: 0.5});
+        gsap.fromTo(phase3.querySelector('.loader-attrib'), {opacity: 0}, {opacity: 1, duration: 0.8, delay: 1});
+      }
+    }, 2200);
+    
+    // 3.5s: Identity Reveal
+    setTimeout(() => {
+      console.log('Loader phase 4: identity');
+      if (phase3) gsap.to(phase3, {opacity: 0, duration: 0.5, onComplete: () => phase3.classList.add('hidden')});
+      isImploding = true;
+      
+      if (gainNode) {
+        try { gainNode.gain.linearRampToValueAtTime(0, 1); } catch(e){}
+      }
+      
+      setTimeout(() => {
+        if (animationFrame) cancelAnimationFrame(animationFrame);
+        if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        if (phase4) {
+          phase4.classList.remove('hidden');
+          const logoSvg = document.getElementById('knp-loader-svg');
+          if (logoSvg) {
+            const polygon = logoSvg.querySelector('polygon');
+            const length = polygon.getTotalLength();
+            polygon.style.strokeDasharray = length;
+            polygon.style.strokeDashoffset = length;
+            gsap.to(polygon, {strokeDashoffset: 0, duration: 0.6, ease: 'power2.inOut'});
+          }
+          
+          const nameEl = document.querySelector('.loader-name');
+          if (nameEl) {
+            const text = "KAILASH NARAYANA PRASAD";
+            nameEl.textContent = '';
+            let charIdx = 0;
+            const typeInt = setInterval(() => {
+              nameEl.textContent += text[charIdx];
+              charIdx++;
+              if (charIdx >= text.length) {
+                clearInterval(typeInt);
+                const scanline = document.querySelector('.scanline');
+                if (scanline) {
+                  scanline.style.width = '100%';
+                  scanline.style.opacity = '1';
+                }
+              }
+            }, 30);
+          }
+        }
+      }, 300);
+    }, 3500);
+    
+    // 4.5s: Shatter Reveal
+    setTimeout(() => {
+      console.log('Loader phase 5: shatter');
+      if (phase4) phase4.classList.add('hidden');
+      if (innerContent) innerContent.style.display = 'none';
+      
+      if (shardsContainer) {
+        for (let i = 0; i < 12; i++) {
+          const shard = document.createElement('div');
+          shard.className = 'loader-shard';
+          const p1 = `${Math.random()*100}% ${Math.random()*100}%`;
+          const p2 = `${Math.random()*100}% ${Math.random()*100}%`;
+          const p3 = `${Math.random()*100}% ${Math.random()*100}%`;
+          shard.style.clipPath = `polygon(${p1}, ${p2}, ${p3})`;
+          shard.style.backgroundColor = '#0a0a0a';
+          shardsContainer.appendChild(shard);
+          
+          const angle = (Math.PI * 2 * i) / 12;
+          const dist = 500 + Math.random() * 500;
+          
+          gsap.to(shard, {
+            x: Math.cos(angle) * dist,
+            y: Math.sin(angle) * dist,
+            rotation: (Math.random() - 0.5) * 360,
+            opacity: 0,
+            duration: 1.2,
+            delay: i * 0.03,
+            ease: 'power3.out'
+          });
+        }
+      }
+      
+      setTimeout(revealSite, 800);
+    }, 4500);
+
+  } catch (e) {
+    console.error('Loader crashed, activating emergency bypass:', e);
+    revealSite();
+  }
 }
 
 function revealSite() {
-  const loader = document.getElementById('loader');
-  loader.style.display = 'none';
-  document.body.classList.add('loaded');
-  
-  if (window.startAnimations) window.startAnimations();
-  if (window.triggerGif) window.triggerGif('onSiteReveal');
-  initFloatingTerminal();
+  try {
+    console.log('Loader complete: revealing site');
+    const loader = document.getElementById('loader');
+    if (loader) {
+      loader.style.opacity = 0;
+      setTimeout(() => {
+        loader.style.display = 'none';
+        if (loader.parentNode) loader.remove();
+      }, 500);
+    }
+    document.body.classList.add('loaded');
+    document.body.style.overflow = 'auto';
+    document.body.style.visibility = 'visible';
+    document.body.style.opacity = '1';
+    
+    if (window._portfolioFailsafe) clearTimeout(window._portfolioFailsafe);
+    if (window.startAnimations) window.startAnimations();
+    if (window.triggerGif) window.triggerGif('onSiteReveal');
+    initFloatingTerminal();
+  } catch (e) {
+    console.error('revealSite failed:', e);
+    // Absolute final resort
+    document.body.style.opacity = '1';
+    document.body.style.visibility = 'visible';
+    document.body.style.overflow = 'auto';
+  }
 }
 
 function initFloatingTerminal() {
@@ -377,4 +463,3 @@ function initFloatingTerminal() {
     }
   }, 3000);
 }
-

@@ -1,6 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>
+    // Nuclear failsafe — if anything crashes, show the site after 4 seconds
+    window._portfolioFailsafe = setTimeout(function() {
+      var loader = document.getElementById('loader') || 
+                   document.getElementById('cinematic-loader') ||
+                   document.getElementById('loading-screen') ||
+                   document.querySelector('[id*="load"]') ||
+                   document.querySelector('[id*="intro"]');
+      if (loader) {
+        loader.style.display = 'none';
+        loader.remove();
+      }
+      document.body.style.overflow = 'auto';
+      document.body.style.visibility = 'visible';
+      document.body.style.opacity = '1';
+      var hero = document.getElementById('hero') ||
+                 document.querySelector('section') ||
+                 document.querySelector('main');
+      if (hero) hero.style.opacity = '1';
+      console.warn('Loader failsafe triggered.');
+    }, 4000);
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kailash Narayana Prasad — Cybersecurity & AI/ML Engineer</title>
