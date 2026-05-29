@@ -185,6 +185,18 @@ section:nth-of-type(even) {
   background-color: var(--deep);
 }
 
+h1, h2, .section-title { 
+  word-break: keep-all; 
+  overflow-wrap: normal;
+  hyphens: none;
+}
+
+.section-title {
+  font-size: clamp(32px, 5vw, 64px);
+  line-height: 1.1;
+  max-width: 100%;
+}
+
 /* Splitting.js Char Fallback */
 .char { 
   display: inline-block; 

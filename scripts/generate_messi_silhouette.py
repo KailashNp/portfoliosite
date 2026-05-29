@@ -1,4 +1,7 @@
-<svg viewBox="0 0 120 160" xmlns="http://www.w3.org/2000/svg">
+import os
+
+def generate_messi():
+    svg_content = """<svg viewBox="0 0 120 160" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="barca-grad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#A50044"/>
@@ -52,4 +55,13 @@
   <rect x="30" y="118" width="60" height="3" fill="#74ACDF"/>
   <rect x="30" y="121" width="60" height="3" fill="#FFFFFF"/>
   <rect x="30" y="124" width="60" height="3" fill="#74ACDF"/>
-</svg>
+</svg>"""
+    
+    output_path = "assets/images/messi-worldcup.svg"
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    with open(output_path, "w") as f:
+        f.write(svg_content)
+    print(f"Generated {output_path}")
+
+if __name__ == "__main__":
+    generate_messi()

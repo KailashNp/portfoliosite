@@ -1,27 +1,42 @@
 <svg viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
-  <!-- Shield Outline -->
-  <path d="M 50,5 L 90,5 L 90,45 Q 90,85 50,115 Q 10,85 10,45 L 10,5 Z" fill="#0D0D1A" />
-  
-  <!-- Clipping path for the inside of the shield -->
-  <defs>
-    <clipPath id="shield-clip">
-      <path d="M 50,5 L 90,5 L 90,45 Q 90,85 50,115 Q 10,85 10,45 L 10,5 Z" />
-    </clipPath>
-  </defs>
+<defs>
+  <linearGradient id="crest-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" style="stop-color:#A50044;stop-opacity:1"/>
+    <stop offset="50%" style="stop-color:#6B0070;stop-opacity:1"/>
+    <stop offset="100%" style="stop-color:#004D98;stop-opacity:1"/>
+  </linearGradient>
+  <clipPath id="left-half-clip">
+    <rect x="0" y="0" width="50" height="120" />
+  </clipPath>
+</defs>
 
-  <g clip-path="url(#shield-clip)">
-    <!-- Left Half: Catalan Stripes (Senyera spirit) -->
-    <rect x="10" y="5" width="40" height="115" fill="#004D98" />
-    <rect x="18" y="5" width="5" height="115" fill="#A50044" />
-    <rect x="28" y="5" width="5" height="115" fill="#A50044" />
-    <rect x="38" y="5" width="5" height="115" fill="#A50044" />
-    <rect x="48" y="5" width="2" height="115" fill="#A50044" />
+<!-- Shield outline -->
+<path d="M 50,4 L 96,4 L 96,52 Q 96,95 50,118 Q 4,95 4,52 L 4,4 Z"
+      fill="url(#crest-grad)" opacity="0.9"/>
 
-    <!-- Right Half: Sant Jordi's Cross abstract -->
-    <rect x="50" y="5" width="40" height="115" fill="#004D98" />
-    <path d="M 55,10 L 85,40 M 85,10 L 55,40" stroke="#A50044" stroke-width="6" fill="none" />
-    
-    <!-- Top Center Star -->
-    <path d="M 50,15 L 52,22 L 59,22 L 54,27 L 56,34 L 50,30 L 44,34 L 46,27 L 41,22 L 48,22 Z" fill="#FFD700" />
-  </g>
+<!-- Inner shield border -->
+<path d="M 50,10 L 90,10 L 90,52 Q 90,90 50,112 Q 10,90 10,52 L 10,10 Z"
+      fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+
+<!-- Top horizontal divider -->
+<line x1="10" y1="30" x2="90" y2="30" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+
+<!-- Left half: vertical stripes (senyera) -->
+<g clip-path="url(#left-half-clip)">
+  <rect x="10" y="30" width="10" height="40" fill="#FFD700" opacity="0.7"/>
+  <rect x="20" y="30" width="10" height="40" fill="#A50044" opacity="0.8"/>
+  <rect x="30" y="30" width="10" height="40" fill="#FFD700" opacity="0.7"/>
+  <rect x="40" y="30" width="10" height="40" fill="#A50044" opacity="0.8"/>
+</g>
+
+<!-- Right half: cross shape -->
+<rect x="60" y="32" width="28" height="8" fill="rgba(255,255,255,0.25)"/>
+<rect x="71" y="30" width="8" height="40" fill="rgba(255,255,255,0.25)"/>
+
+<!-- Top center: single star -->
+<polygon points="50,6 51.8,11.5 57.5,11.5 52.9,14.8 54.7,20.3 50,17 45.3,20.3 47.1,14.8 42.5,11.5 48.2,11.5"
+         fill="#FFD700" opacity="0.9"/>
+
+<!-- Vertical center divider -->
+<line x1="50" y1="10" x2="50" y2="100" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
 </svg>

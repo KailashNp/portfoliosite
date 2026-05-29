@@ -94,6 +94,10 @@ section {
   display: none !important;
 }
 
+#about .col-left {
+  padding-right: 40px;
+}
+
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
   .container {

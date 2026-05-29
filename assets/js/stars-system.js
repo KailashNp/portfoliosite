@@ -17,9 +17,31 @@ class StarsSystem {
       document.body.appendChild(el);
     });
 
-    window.addEventListener('resize', () => {
-      // Simple debounce or just let it be for now as stars are fixed %
-    });
+    window.addEventListener('scroll', () => {
+      const scrollY = window.scrollY;
+      document.querySelectorAll('.floating-star').forEach((star, i) => {
+        const speed = 0.1 + (i % 5) * 0.04;
+        star.style.setProperty('--parallax', `${scrollY * speed}px`);
+      });
+    }, { passive: true });
+  }
+
+  randomStarPosition() {
+    const zones = [
+      { top: [8,25], left: [75,95] },
+      { top: [8,25], left: [3,20] },
+      { top: [35,55], left: [85,97] },
+      { top: [35,55], left: [1,12] },
+      { top: [65,85], left: [78,95] },
+      { top: [65,85], left: [2,18] },
+      { top: [45,65], left: [88,97] },
+      { top: [20,40], left: [1,8] },
+    ];
+    const zone = zones[Math.floor(Math.random() * zones.length)];
+    return {
+      top: zone.top[0] + Math.random() * (zone.top[1] - zone.top[0]) + '%',
+      left: zone.left[0] + Math.random() * (zone.left[1] - zone.left[0]) + '%'
+    };
   }
 
   createStar(star, index) {
@@ -28,21 +50,21 @@ class StarsSystem {
     div.innerHTML = star.shape || '✦';
     
     const color = this.getColor(star.color);
+    const pos = this.randomStarPosition();
     
     div.style.cssText = `
       position: fixed;
-      top: ${star.position.top || 'auto'};
-      left: ${star.position.left || 'auto'};
-      right: ${star.position.right || 'auto'};
-      bottom: ${star.position.bottom || 'auto'};
-      font-size: ${10 + Math.random() * 6}px;
+      top: ${pos.top};
+      left: ${pos.left};
+      font-size: ${6 + Math.random() * 4}px;
       color: ${color};
       cursor: pointer;
       z-index: 50;
-      animation: star-pulse ${2.5 + index * 0.3}s ease-in-out infinite;
+      animation: star-pulse ${4 + Math.random() * 3}s ease-in-out infinite;
       transition: all 0.2s ease;
       text-shadow: 0 0 8px ${color};
       user-select: none;
+      --parallax: 0px;
     `;
 
     div.addEventListener('mouseenter', () => this.showTooltip(star, div));
@@ -88,7 +110,8 @@ class StarsSystem {
     
     if (top < 10) {
       top = rect.bottom + 15;
-      tooltip.querySelector('.star-arrow').style.display = 'none'; // simple fix for flipped
+      const arrow = tooltip.querySelector('.star-arrow');
+      if (arrow) arrow.style.display = 'none';
     }
 
     tooltip.style.left = left + 'px';
@@ -118,8 +141,7 @@ const portfolioStars = [
     title: "La Remontada",
     description: "Sergio Roberto. 95th minute. Camp Nou erupts. 6–1.",
     stat: "6 — 1",
-    color: "crimson",
-    position: { top: "18%", left: "88%" }
+    color: "crimson"
   },
   {
     date: "17 April 2021",
@@ -127,8 +149,7 @@ const portfolioStars = [
     title: "Ankara Messi",
     description: "He picked it up near halfway. Nobody stopped him. Nobody could.",
     stat: "Goal № 672",
-    color: "gold",
-    position: { top: "35%", left: "6%" }
+    color: "gold"
   },
   {
     date: "6 May 2015",
@@ -136,8 +157,7 @@ const portfolioStars = [
     title: "The Touch",
     description: "Busquets. One touch. Nutmeg. Messi through on goal. That's it.",
     stat: "Barça 3 — 0 Bayern",
-    color: "royal",
-    position: { top: "52%", right: "7%" }
+    color: "royal"
   },
   {
     date: "23 April 2017",
@@ -145,8 +165,7 @@ const portfolioStars = [
     title: "That Celebration",
     description: "93rd minute. Real Madrid. He stood still. Shirt off. The number 10.",
     stat: "93' ⚽",
-    color: "gold",
-    position: { top: "67%", left: "5%" }
+    color: "gold"
   },
   {
     date: "19 July 2022",
@@ -154,8 +173,7 @@ const portfolioStars = [
     title: "Lewandowski Blaugrana",
     description: "Robert Lewandowski signed for FC Barcelona. A new era begins.",
     stat: "№ 9",
-    color: "crimson",
-    position: { top: "78%", right: "9%" }
+    color: "crimson"
   },
   {
     date: "27 May 2009",
@@ -163,8 +181,7 @@ const portfolioStars = [
     title: "El Triplete",
     description: "La Liga. Copa del Rey. Champions League. Pep's first season. Historic.",
     stat: "Treble 2009",
-    color: "gold",
-    position: { top: "25%", right: "5%" }
+    color: "gold"
   },
   {
     date: "19 December 2009",
@@ -172,8 +189,7 @@ const portfolioStars = [
     title: "El Sextete",
     description: "Six trophies in a single calendar year. Never done before. Never since.",
     stat: "6 Trophies",
-    color: "royal",
-    position: { top: "88%", left: "15%" }
+    color: "royal"
   },
   {
     date: "11 July 2010",
@@ -181,8 +197,7 @@ const portfolioStars = [
     title: "93:20",
     description: "Gràcies, Andrés. Some moments belong to everyone.",
     stat: "93' 20\"",
-    color: "crimson",
-    position: { top: "44%", left: "91%" }
+    color: "crimson"
   },
   {
     shape: "★",
@@ -191,8 +206,7 @@ const portfolioStars = [
     title: "The Helicopter Six",
     description: "India needed 4 off 1. Dhoni walked in. You know what happened.",
     stat: "SIX ✦",
-    color: "yellow",
-    position: { top: "15%", left: "12%" }
+    color: "yellow"
   },
   {
     shape: "★",
@@ -201,8 +215,7 @@ const portfolioStars = [
     title: "Five-Time Champions",
     description: "Back from the brink. Dhoni lifts another one. CSK forever.",
     stat: "5 Titles",
-    color: "yellow",
-    position: { top: "60%", left: "88%" }
+    color: "yellow"
   },
   {
     shape: "★",
@@ -211,8 +224,7 @@ const portfolioStars = [
     title: "Joginder's Last Over",
     description: "Dhoni gave the last over to Joginder Sharma. Ice in his veins.",
     stat: "India WC 2007",
-    color: "orange",
-    position: { top: "72%", left: "78%" }
+    color: "orange"
   },
   {
     shape: "★",
@@ -221,8 +233,7 @@ const portfolioStars = [
     title: "The Fastest Hands",
     description: "0.08 seconds. Bails off before anyone sees them move. Captain Cool.",
     stat: "0.08 sec",
-    color: "yellow",
-    position: { top: "30%", left: "3%" }
+    color: "yellow"
   },
   {
     shape: "★",
@@ -231,8 +242,7 @@ const portfolioStars = [
     title: "Whistle Podu",
     description: "Two years away. First game back. Sold-out stadium. Yellow everywhere.",
     stat: "IPL 2018 Return",
-    color: "yellow",
-    position: { top: "82%", right: "20%" }
+    color: "yellow"
   },
   {
     shape: "★",
@@ -241,13 +251,11 @@ const portfolioStars = [
     title: "Thala Finishes It",
     description: "Last ball needed. Dhoni hit it into the stands. Turned 41. Didn't matter.",
     stat: "Last Ball ⚡",
-    color: "orange",
-    position: { top: "55%", left: "14%" }
+    color: "orange"
   }
 ];
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Delay star system slightly to not interfere with loader
   setTimeout(() => {
     new StarsSystem(portfolioStars);
   }, 5000);
