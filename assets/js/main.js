@@ -1,12 +1,34 @@
 /* main.js - Core UI Coordination and Small Components */
 
 document.addEventListener('DOMContentLoaded', () => {
+  window.scrollTo(0, 0); // Always start at top
   initClock();
   initNavigation();
   initTyped();
   initLenis();
   initAmbientShapes();
+  initScrollProgressBar();
 });
+
+function initScrollProgressBar() {
+  const progressBar = document.createElement('div');
+  progressBar.id = 'scroll-progress';
+  progressBar.style.position = 'fixed';
+  progressBar.style.top = '0';
+  progressBar.style.left = '0';
+  progressBar.style.height = '4px';
+  progressBar.style.background = 'var(--grad-blaugrana-h)';
+  progressBar.style.zIndex = '99999';
+  progressBar.style.transition = 'width 0.1s ease';
+  document.body.appendChild(progressBar);
+
+  window.addEventListener('scroll', () => {
+    const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+    const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    const scrolled = (winScroll / height) * 100;
+    progressBar.style.width = scrolled + '%';
+  });
+}
 
 // Ambient Geometric Shapes
 function initAmbientShapes() {

@@ -169,3 +169,30 @@ body::after {
   background: linear-gradient(135deg, rgba(165, 0, 68, 0.15) 0%, rgba(0, 77, 152, 0.15) 100%);
   border: 1px solid var(--crimson-glow);
 }
+
+/* Custom Cursor Fixes */
+*, *::before, *::after { cursor: none !important; }
+
+.cursor-dot, .cursor-ring {
+  z-index: 99999 !important;
+}
+
+/* Alternating Section Backgrounds */
+section:nth-of-type(odd) {
+  background-color: var(--void);
+}
+section:nth-of-type(even) {
+  background-color: var(--deep);
+}
+
+/* Splitting.js Char Fallback */
+.char { 
+  display: inline-block; 
+  opacity: 0; 
+  transform: translateY(20px);
+  transition: opacity 0.4s ease, transform 0.4s ease; 
+}
+.char.visible { 
+  opacity: 1; 
+  transform: translateY(0); 
+}

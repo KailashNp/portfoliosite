@@ -274,7 +274,22 @@ AUTHOR: Kailash Narayana Prasad <kailashnprasad@gmail.com>
         clear: (args, terminal) => {
             terminal.body.querySelectorAll('.terminal-output, .terminal-command-line').forEach(e => e.remove());
             return null;
+        },
+
+        "93:20": () => {
+            return "Gràcies, Andrés. Some moments don't need explaining.";
         }
+    };
+
+    // Special section label commands mapping
+    const sectionCommands = {
+        "/usr/bin/kailash --interactive": { cmd: "welcome", dest: "terminal-section" },
+        "ls -la ./arsenal": { cmd: "ls skills/", dest: "arsenal" },
+        "cat /var/log/projects.log": { cmd: "ls projects/", dest: "operations" },
+        "git log --oneline": { cmd: "git log", dest: "journey" },
+        "ssh recruiter@kailash.dev": { cmd: "contact info", dest: "contact" },
+        "about.exe": { cmd: "about", dest: "about" },
+        "cat ~/.profile | grep interests": { cmd: "interests", dest: "beyond" }
     };
 
     // --- UTILITIES ---
@@ -377,19 +392,26 @@ AUTHOR: Kailash Narayana Prasad <kailashnprasad@gmail.com>
                 cmdLine.innerHTML = `${PROMPT} <span>${fullCmd}</span>`;
                 terminal.body.insertBefore(cmdLine, terminal.input.parentElement);
 
-                const [cmd, ...args] = fullCmd.split(' ');
-                
                 const output = document.createElement('div');
                 output.className = 'terminal-output';
                 terminal.body.insertBefore(output, terminal.input.parentElement);
 
-                if (commands[cmd]) {
-                    const result = commands[cmd](args, terminal);
-                    if (result) {
-                        await typeWriter(result, output);
-                    }
+                // Check for exact section label commands
+                if (sectionCommands[fullCmd]) {
+                    const map = sectionCommands[fullCmd];
+                    await typeWriter(`Executing: ${map.cmd}... done. Redirecting.`, output);
+                    scrollToSection(map.dest);
                 } else {
-                    await typeWriter(`command not found: ${cmd}. Type 'help' for available commands.`, output);
+                    const [cmd, ...args] = fullCmd.split(' ');
+                    
+                    if (commands[cmd]) {
+                        const result = commands[cmd](args, terminal);
+                        if (result) {
+                            await typeWriter(result, output);
+                        }
+                    } else {
+                        await typeWriter(`command not found: ${cmd}. Type 'help' for available commands.`, output);
+                    }
                 }
 
                 cleanupHistory(terminal.body);
@@ -402,17 +424,6 @@ AUTHOR: Kailash Narayana Prasad <kailashnprasad@gmail.com>
             terminal.window.addEventListener('click', () => terminal.input.focus());
         }
     });
-
-    // Auto-focus logic for main terminal
-    const mainTerminalWindow = terminals[0].window;
-    if (mainTerminalWindow) {
-        const observer = new IntersectionObserver((entries) => {
-            if (entries[0].isIntersecting) {
-                terminals[0].input.focus();
-            }
-        }, { threshold: 0.5 });
-        observer.observe(mainTerminalWindow);
-    }
 
     // --- FLOATING TERMINAL LOGIC ---
     const floatingOverlay = document.getElementById('floating-terminal-overlay');
@@ -430,16 +441,25 @@ AUTHOR: Kailash Narayana Prasad <kailashnprasad@gmail.com>
     function closeFloatingTerminal() {
         floatingOverlay.classList.add('hidden');
     }
+    
+    window.toggleFloatingTerminal = function() {
+        if (floatingOverlay.classList.contains('hidden')) {
+            openFloatingTerminal();
+        } else {
+            closeFloatingTerminal();
+        }
+    };
 
-    // Toggle shortcut Ctrl + `
-    document.addEventListener('keydown', (e) => {
-        if (e.ctrlKey && e.key === '`') {
+    // Toggle shortcut Ctrl + ` or Ctrl+Shift+T
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey && (e.key === '`' || e.key === 'Dead' || e.keyCode === 192)) {
             e.preventDefault();
-            if (floatingOverlay.classList.contains('hidden')) {
-                openFloatingTerminal();
-            } else {
-                closeFloatingTerminal();
-            }
+            toggleFloatingTerminal();
+        }
+        // Also support Ctrl+Shift+T as backup shortcut
+        if (e.ctrlKey && e.shiftKey && e.key === 'T') {
+            e.preventDefault();
+            toggleFloatingTerminal();
         }
         
         // Esc to close
@@ -453,17 +473,44 @@ AUTHOR: Kailash Narayana Prasad <kailashnprasad@gmail.com>
     }
 
     if (closeBtn) {
-        closeBtn.addEventListener('click', closeFloatingTerminal);
+        closeBtn.onclick = function(e) {
+            e.stopPropagation();
+            closeFloatingTerminal();
+        };
     }
     
     if (minBtn) {
-        minBtn.addEventListener('click', closeFloatingTerminal);
+        minBtn.onclick = function(e) {
+            e.stopPropagation();
+            const win = document.querySelector('.floating-terminal-window');
+            if (win.style.height === '42px') {
+                win.style.height = '400px';
+            } else {
+                win.style.height = '42px';
+            }
+        };
     }
 
     if (maxBtn) {
-        maxBtn.addEventListener('click', () => {
+        maxBtn.onclick = function(e) {
+            e.stopPropagation();
             const win = document.querySelector('.floating-terminal-window');
             win.classList.toggle('maximized');
+            if (!win.classList.contains('maximized')) {
+                win.style.height = '400px';
+            } else {
+                win.style.height = 'auto';
+            }
+        };
+    }
+
+    // Minimize restore on header click if minimized
+    if (handle) {
+        handle.addEventListener('click', function(e) {
+            const win = document.querySelector('.floating-terminal-window');
+            if (win.style.height === '42px') {
+                win.style.height = '400px';
+            }
         });
     }
 
