@@ -8,7 +8,67 @@ document.addEventListener('DOMContentLoaded', () => {
   initLenis();
   initAmbientShapes();
   initScrollProgressBar();
+  initMessiSection();
+  initSectionHeadings();
 });
+
+function initSectionHeadings() {
+  const headings = document.querySelectorAll('.section-title');
+  headings.forEach(h => {
+    if (window.Splitting) {
+      Splitting({ target: h, by: 'chars' });
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const chars = entry.target.querySelectorAll('.char');
+            gsap.fromTo(chars, 
+              { opacity: 0, y: 20 },
+              { opacity: 1, y: 0, duration: 0.4, stagger: 0.03, ease: 'power2.out' }
+            );
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.2 });
+      observer.observe(h);
+    }
+  });
+}
+
+function initMessiSection() {
+  const section = document.getElementById('greatest-moment');
+  const silhouette = document.getElementById('messi-silhouette');
+  if (!section || !silhouette) return;
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        silhouette.classList.add('visible');
+        createGoldParticles();
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  observer.observe(section);
+}
+
+function createGoldParticles() {
+  const container = document.getElementById('gold-particles-container');
+  if (!container) return;
+
+  for (let i = 0; i < 15; i++) {
+    const p = document.createElement('div');
+    p.className = 'gold-particle';
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 50 + Math.random() * 100;
+    p.style.setProperty('--dx', `${Math.cos(angle) * dist}px`);
+    p.style.setProperty('--dy', `${-Math.random() * 150 - 50}px`);
+    p.style.left = '50%';
+    p.style.top = '10%'; // Near the trophy
+    p.style.animationDelay = `${Math.random() * 2}s`;
+    container.appendChild(p);
+  }
+}
 
 function initScrollProgressBar() {
   const progressBar = document.createElement('div');

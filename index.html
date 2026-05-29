@@ -58,7 +58,7 @@
 <body>
 
   <!-- 1. LOADING SCREEN -->
-  <div id="loader" class="loader-overlay">
+  <div id="loader" class="loader-overlay" style="z-index: 99999;">
     <!-- Shards container for clip-path shatter effect -->
     <div id="loader-shards-container"></div>
     <div class="loader-content" id="loader-content-inner">
@@ -85,6 +85,8 @@
         </div>
       </div>
     </div>
+    <!-- Skip button -->
+    <button id="loader-skip" style="position: fixed; bottom: 30px; right: 30px; background: none; border: none; color: var(--terminal); font-family: var(--font-mono); font-size: 12px; cursor: pointer; opacity: 0.4; z-index: 100000; transition: opacity 0.3s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.4">skip &rarr;</button>
   </div>
 
   <!-- FLOATING TERMINAL ELEMENTS -->
@@ -151,15 +153,20 @@
   </nav>
 
   <!-- 3. HERO SECTION -->
-  <section id="hero" class="hero-section">
-    <div id="three-canvas-container"></div>
-    <div class="hero-watermark">SIGNAL & NOISE</div>
-    <div class="container hero-container">
+  <section id="hero" class="hero-section" style="position: relative; overflow: hidden;">
+    <div id="three-canvas-container" style="position: absolute; inset: 0; z-index: 1; pointer-events: none;"></div>
+    <div class="hero-watermark" style="z-index: 1;">SIGNAL & NOISE</div>
+    
+    <!-- Barca Crest Watermark -->
+    <img src="assets/images/barca-silhouette.svg" class="barca-watermark" style="bottom: -20px; right: 40px; width: auto; height: 280px; opacity: 0.04; filter: blur(0.5px);" alt="">
+
+    <div class="container hero-container" style="position: relative; z-index: 10;">
       <div class="hero-content">
         <div class="hero-label mono">// Kailash Narayana Prasad</div>
-        <h1 class="hero-title">
+        <h1 class="hero-title" style="font-size: 96px; line-height: 0.9;">
           KAILASH<br>
-          <span class="blaugrana-text">NARAYANA PRASAD</span>
+          <span class="blaugrana-text">NARAYANA</span><br>
+          <span class="blaugrana-text">PRASAD</span>
         </h1>
         <div class="hero-subtitle terminal-green">
           <span id="typed-text"></span>
@@ -516,8 +523,12 @@
   </section>
 
   <!-- MESSI SECTION -->
-  <section id="greatest-moment" style="background-color: var(--deep); position: relative; padding: 100px 0; border-top: 1px solid rgba(255,255,255,0.05);">
+  <section id="greatest-moment" style="background-color: var(--deep); position: relative; padding: 120px 0; border-top: 1px solid rgba(255,255,255,0.05); overflow: hidden;">
+    <!-- Barca Crest Watermark (Rotating) -->
+    <img src="assets/images/barca-silhouette.svg" class="barca-watermark" style="top: 50%; left: 50%; transform: translate(-50%, -50%); height: 400px; opacity: 0.06; filter: blur(1px); animation: crest-rotate 120s linear infinite;" alt="">
+    
     <div style="position: absolute; inset: 0; background: repeating-linear-gradient(45deg, rgba(165, 0, 68, 0.04) 0px, rgba(165, 0, 68, 0.04) 2px, transparent 2px, transparent 10px); z-index: 0;"></div>
+    
     <div class="container" style="position: relative; z-index: 1; text-align: center;">
       
       <p class="mono terminal-green" style="font-size: 0.85rem; margin-bottom: 2rem;">18 December 2022. Lusail Stadium, Qatar.</p>
@@ -526,44 +537,10 @@
         "He didn't just win the World Cup."<br><br>"He completed football."
       </h2>
       
-      <div style="margin: 4rem auto; position: relative; height: 150px; width: 100px;">
-        <style>
-          @keyframes bounceJump {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
-          }
-          @keyframes floatStar {
-            0% { transform: translateY(10px); opacity: 0; }
-            50% { opacity: 1; }
-            100% { transform: translateY(-20px); opacity: 0; }
-          }
-        </style>
-        <!-- Tiny particles/stars -->
-        <div style="position: absolute; width: 100%; height: 100%; top: -30px;">
-          <span style="position: absolute; left: 10%; animation: floatStar 3s infinite 0.1s; color: #FFD700; font-size: 10px;">✦</span>
-          <span style="position: absolute; right: 20%; animation: floatStar 2.5s infinite 0.5s; color: var(--crimson); font-size: 8px;">✦</span>
-          <span style="position: absolute; left: 50%; animation: floatStar 3.5s infinite 0.3s; color: #FFD700; font-size: 12px;">✦</span>
-          <span style="position: absolute; right: -10%; animation: floatStar 2.8s infinite 0.8s; color: white; font-size: 10px;">✦</span>
-        </div>
-        <!-- Stick figure holding trophy -->
-        <div style="animation: bounceJump 1s ease-in-out infinite;">
-          <svg viewBox="0 0 100 150" width="100" height="150" stroke="white" stroke-width="3" stroke-linecap="round" fill="none">
-            <!-- Trophy -->
-            <path d="M40,20 C35,20 30,10 50,10 C70,10 65,20 60,20 C60,35 55,40 50,45 C45,40 40,35 40,20 Z" stroke="#FFD700" fill="#FFD700"/>
-            <!-- Head -->
-            <circle cx="50" cy="65" r="10" />
-            <!-- Body -->
-            <line x1="50" y1="75" x2="50" y2="110" />
-            <!-- Arms raised to trophy -->
-            <line x1="50" y1="80" x2="35" y2="45" />
-            <line x1="50" y1="80" x2="65" y2="45" />
-            <!-- Legs -->
-            <line x1="50" y1="110" x2="35" y2="140" />
-            <line x1="50" y1="110" x2="65" y2="140" />
-          </svg>
-        </div>
-        <!-- Argentina Flag Bar -->
-        <div style="position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%); width: 80px; height: 3px; background: linear-gradient(to right, #74ACDF 33%, white 33%, white 66%, #74ACDF 66%);"></div>
+      <div class="messi-figure-container">
+        <div class="messi-radial-glow"></div>
+        <div id="gold-particles-container"></div>
+        <img src="assets/images/messi-worldcup.svg" alt="Messi lifting World Cup" class="messi-svg" id="messi-silhouette">
       </div>
 
       <div style="display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 4rem;">
@@ -629,8 +606,11 @@
   </section>
 
   <!-- 12. FOOTER -->
-  <footer id="footer">
-    <div class="container footer-container">
+  <footer id="footer" style="position: relative; overflow: hidden;">
+    <!-- Barca Crest Watermark -->
+    <img src="assets/images/barca-silhouette.svg" class="barca-watermark" style="top: 50%; left: 50%; transform: translate(-50%, -50%); height: 200px; opacity: 0.05;" alt="">
+    
+    <div class="container footer-container" style="position: relative; z-index: 1;">
       <div class="footer-left">
         <div class="logo">KNP</div>
         <p>Built with precision by Kailash Narayana Prasad · 2026<br>Signal found. Noise eliminated. Open to work.</p>
@@ -660,6 +640,7 @@
 
   <!-- Scripts -->
   <script src="assets/js/loader.js"></script>
+  <script src="assets/js/stars-system.js"></script>
   <script src="assets/js/cursor.js"></script>
   <script src="assets/js/animations.js"></script>
   <script src="assets/js/three-scene.js"></script>
